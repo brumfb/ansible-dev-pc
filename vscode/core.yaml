@@ -7,6 +7,16 @@
 
   tasks:
     - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    
+    # Set WSL Facts
+    - name: Get Windows User Location
+      shell: "wslpath $(wslvar USERPROFILE)"
+      register: WslUserProfile
+      run_once: true
+      when: is_wsl
+
+    - set_fact: WslUserProfilePath={{ WslUserProfile.stdout }}
+      when: is_wsl
 
     # Linux
 
@@ -43,7 +53,7 @@
     - name: Create shortcut to Windows ~/.vscode (WSL)
       file:
         path: ~/.vscode
-        src: /mnt/c/Users/{{ lookup('ENV', 'USER' )}}/.vscode
+        src: "{{ WslUserProfilePath }}/.vscode"
         state: link
       when: is_wsl
 
@@ -56,7 +66,7 @@
     - name: Create shortcut to Windows ~/.config/Code (WSL)
       file:
         path: ~/.config/Code
-        src: /mnt/c/Users/{{ lookup('ENV', 'USER' )}}/AppData/Roaming/Code
+        src:  "{{WslUserProfilePath}}/AppData/Roaming/Code"
         state: link
       when: is_wsl
 
