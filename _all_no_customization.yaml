@@ -19,9 +19,8 @@
 - import_playbook: vscode/core.yaml
 
 # Azure
-- import_playbook: azure/az.yaml
-- import_playbook: azure/azshell.yaml
-- import_playbook: azure/storage-explorer.yaml
+# - import_playbook: azure/az.yaml
+# - import_playbook: azure/azshell.yaml
 
 # Broot
 - import_playbook: broot/core.yaml
@@ -40,7 +39,7 @@
 
 # GitHub
 - import_playbook: github/gh.yaml
-- import_playbook: github/hub.yaml
+# no snap, don't isntall - import_playbook: github/hub.yaml
 
 # golang
 - import_playbook: golang/core.yaml
@@ -52,7 +51,7 @@
 - import_playbook: virtualization/core.yaml
 
 # Mono (.NET Framework)
-- import_playbook: mono/core.yaml
+# - import_playbook: mono/core.yaml
 
 # NodeJS
 - import_playbook: nodejs/core.yaml
