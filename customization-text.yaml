@@ -96,7 +96,7 @@
               info "CPU" cpu
               info "Memory" memory
               info "GPU" gpu
-              info "Screens" resolution
+              # info "Screens" resolution
               info "Disk" disk
               info "Battery" battery
           }
