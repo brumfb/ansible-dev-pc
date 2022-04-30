@@ -2,7 +2,6 @@
   // Debugging
   "debug.internalConsoleOptions": "openOnSessionStart",
   "debug.toolBarLocation": "docked",
-
   // Text editor
   "breadcrumbs.enabled": true,
   "editor.autoClosingBrackets": "never",
@@ -18,18 +17,14 @@
   "files.autoSave": "onWindowChange",
   "files.defaultLanguage": "markdown",
   "files.trimTrailingWhitespace": true,
-
   // Explorer
   "explorer.confirmDelete": false,
   "explorer.confirmDragAndDrop": false,
   "explorer.openEditors.visible": 0,
-
   // Git
   "git.inputValidation": "off",
-
   // TypeScript
   "typescript.updateImportsOnFileMove.enabled": "always",
-
   // Themes/colors/fonts/workbench/etc.
   "extensions.ignoreRecommendations": true,
   "material-icon-theme.activeIconPack": "none",
@@ -63,7 +58,6 @@
     // "terminal.ansiYellow": "#c4a000",
     // "terminal.background": "#2e3436",
     // "terminal.foreground": "#b5bbae",
-
     ///// Light colors
     "terminal.ansiBlack": "#eeeeee",
     "terminal.ansiBlue": "#729fcf",
@@ -83,7 +77,6 @@
     "terminal.ansiYellow": "#c4a000",
     "terminal.background": "#eeeeee",
     "terminal.foreground": "#696b67",
-
     "terminal.selectionBackground": "#3465a440",
     "[GitHub Plus]": {
       "editor.background": "#eeeeee",
@@ -95,7 +88,6 @@
       "statusBar.foreground": "#eeeeee"
     }
   },
-  "workbench.colorTheme": "GitHub Plus",
   "workbench.editor.closeEmptyGroups": false,
   "workbench.editor.enablePreview": false,
   "workbench.iconTheme": "material-icon-theme",
@@ -103,16 +95,12 @@
   "workbench.sideBar.location": "left",
   "workbench.startupEditor": "none",
   "workbench.tips.enabled": false,
-
   // extension: Live Share
   "liveshare.featureSet": "insiders",
-
   // extension: Toggle Excluded Files
   "toggleexcludedfiles.statusBar.enabled": true,
-
   // extension: VS Intellicode
   "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
-
   // extension: C#
   "csharp.suppressDotnetRestoreNotification": true,
   "csharp.unitTestDebuggingOptions": {
@@ -120,10 +108,8 @@
   },
   "omnisharp.enableEditorConfigSupport": true,
   "omnisharp.enableRoslynAnalyzers": true,
-
   // extension: PowerShell
   "powershell.integratedConsole.showOnStartup": false,
-
   // extension: Code Spell Checker
   "cSpell.enabledLanguageIds": [
     "asciidoc",
