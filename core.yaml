@@ -3,10 +3,20 @@
   connection: local
 
   vars:
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+    distribution_fallback:
+      'Pop!_OS': 'Ubuntu'
+    distribution: "{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) }}"
+    is_ubu_22_04_or_newer: "{{ distribution == 'Ubuntu' and (ansible_distribution_major_version | int) >= 22 }}"
 
   tasks:
-    # Common
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+
+    - name: Create /etc/apt/keyrings
+      become: yes
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: 0755
 
     - name: Create ~/bin
       file:
@@ -19,8 +29,6 @@
         path: ~/.bashrc
         line: export PATH=$PATH:~/bin
 
-    # Linux
-
     - name: Enable HTTPS APT support
       become: yes
       apt:
@@ -29,8 +37,8 @@
         packages:
           - apt-transport-https
           - ca-certificates
+          - gnupg-agent
           - software-properties-common
-      when: not is_mac
 
     - name: Update APT package list
       become: yes
@@ -39,13 +47,11 @@
       register: apt_update
       retries: 5
       until: apt_update is success
-      when: not is_mac
 
     - name: Upgrade to latest APT packages
       become: yes
       apt:
         upgrade: yes
-      when: not is_mac
 
     - name: Install core packages
       become: yes
@@ -55,7 +61,6 @@
         - curl
         - dconf-editor
         - exfat-fuse
-        - exfatprogs
         - htop
         - inetutils-traceroute
         - jq
@@ -64,38 +69,66 @@
         - unzip
         - uuid
         - xclip
-      when: not is_mac
+
+    - name: "[Ubuntu pre-22.04] Install exfat-utils"
+      become: yes
+      apt:
+        package: exfat-utils
+      when: not is_ubu_22_04_or_newer
+
+    - name: "[Ubuntu 22.04+] Install exfatprogs"
+      become: yes
+      apt:
+        package: exfatprogs
+      when: is_ubu_22_04_or_newer
+
+    - name: "[Non-WSL Ubuntu 22.04+] Install Gnome Extension Manager"
+      become: yes
+      apt:
+        package: gnome-shell-extension-manager
+      when: not is_wsl and is_ubu_22_04_or_newer
+
+    - name: "[Non-WSL] Install snapd"
+      become: yes
+      apt:
+        package: snapd
+      when: not is_wsl
+
+    - name: "[Non-WSL] Install snap core"
+      become: yes
+      command: snap install core
+      args:
+        creates: /snap/core/current/bin/bash
+      when: not is_wsl
+
+    - name: "[Non-WSL] Add /snap/bin to PATH"
+      lineinfile:
+        path: ~/.bashrc
+        line: export PATH=$PATH:/snap/bin
+      when: not is_wsl
 
     - name: Get installed package list
       package_facts: {}
-      when: not is_mac
 
     - name: Add dm-crypt to /etc/initramfs-tools/modules
       become: yes
       lineinfile:
         path: /etc/initramfs-tools/modules
         line: dm-crypt
-      when: not is_mac and ansible_facts.packages["cryptsetup-initramfs"] is defined
+      when: ansible_facts.packages["cryptsetup-initramfs"] is defined
 
-    # macOS
+    - name: "[WSL] Enable systemd"
+      become: yes
+      blockinfile:
+        path: /etc/wsl.conf
+        create: yes
+        marker: "### {mark} Ansible managed: Enable systemd"
+        block: |
+          [boot]
+          systemd=true
+      when: is_wsl
 
-    - name: Update Homebrew and all packages
-      homebrew:
-        update_homebrew: yes
-        upgrade_all: yes
-      when: is_mac
-
-    - name: Install core packages
-      homebrew:
-        name: "{{ item }}"
-      loop:
-        - gnu-tar
-        - htop
-        - jq
-      when: is_mac
-
-    - name: Add GNU tar to the PATH
-      lineinfile:
-        path: ~/.bashrc
-        line: export PATH=/usr/local/opt/gnu-tar/libexec/gnubin:$PATH
-      when: is_mac
+    - name: Ensure ~/.hushlogin exists
+      file:
+        path: ~/.hushlogin
+        state: touch

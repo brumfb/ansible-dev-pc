@@ -3,6 +3,10 @@
   connection: local
 
   vars:
+    distribution_release_snwh_fallback:
+      'jammy': 'focal'
+    distribution_release_snwh: "{{ distribution_release_snwh_fallback[ansible_distribution_release] | default(ansible_distribution_release) }}"
+
     dconf_config:
       # Themes
       - key: /org/gnome/desktop/interface/cursor-theme
@@ -32,7 +36,7 @@
       - key: /org/gnome/settings-daemon/plugins/xsettings/antialiasing
         value: "'grayscale'"
       - key: /org/gnome/shell/favorite-apps
-        value: "['com.alacritty.Alacritty.desktop', 'firefox.desktop', 'postman.desktop', 'slack.desktop', 'Zoom.desktop', 'teams.desktop', 'virt-manager.desktop', 'code.desktop', 'jetbrains-rider.desktop', 'jetbrains-pycharm-ce.desktop', 'sublime_text.desktop', 'sublime_merge.desktop', 'spotify.desktop', 'org.remmina.Remmina.desktop']"
+        value: "['alacritty.desktop', 'microsoft-edge-beta.desktop', 'postman.desktop', 'slack.desktop', 'virt-manager.desktop', 'code.desktop', 'org.remmina.Remmina.desktop']"
       - key: /org/gnome/shell/extensions/desktop-icons/show-home
         value: "false"
       - key: /org/gnome/shell/extensions/desktop-icons/show-trash
@@ -233,16 +237,19 @@
         value: "@as []"
 
     fonts:
-      # FiraCode
-      - https://github.com/tonsky/FiraCode/raw/master/distr/ttf/FiraCode-Regular.ttf
-      - https://github.com/tonsky/FiraCode/raw/master/distr/ttf/FiraCode-Bold.ttf
-      - https://github.com/tonsky/FiraCode/raw/master/distr/ttf/FiraCode-Medium.ttf
-      - https://github.com/tonsky/FiraCode/raw/master/distr/ttf/FiraCode-Light.ttf
       # FiraCode Nerd Font
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Regular/complete/Fira%20Code%20Regular%20Nerd%20Font%20Complete%20Mono.ttf
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Bold/complete/Fira%20Code%20Bold%20Nerd%20Font%20Complete%20Mono.ttf
-      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Medium/complete/Fira%20Code%20Medium%20Nerd%20Font%20Complete%20Mono.ttf
-      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Light/complete/Fira%20Code%20Light%20Nerd%20Font%20Complete%20Mono.ttf
+      # Iosevka
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/Regular/complete/Iosevka%20Nerd%20Font%20Complete%20Mono.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/Italic/complete/Iosevka%20Italic%20Nerd%20Font%20Complete%20Mono.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/Bold/complete/Iosevka%20Bold%20Nerd%20Font%20Complete%20Mono.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/Bold-Italic/complete/Iosevka%20Bold%20Italic%20Nerd%20Font%20Complete%20Mono.ttf
+      # JetBrainsMono Nerd Font
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/JetBrainsMono/Ligatures/Regular/complete/JetBrains%20Mono%20Regular%20Nerd%20Font%20Complete%20Mono.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/JetBrainsMono/Ligatures/Italic/complete/JetBrains%20Mono%20Italic%20Nerd%20Font%20Complete%20Mono.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/JetBrainsMono/Ligatures/Bold/complete/JetBrains%20Mono%20Bold%20Nerd%20Font%20Complete%20Mono.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/JetBrainsMono/Ligatures/BoldItalic/complete/JetBrains%20Mono%20Bold%20Italic%20Nerd%20Font%20Complete%20Mono.ttf
       # UbuntuMono Nerd Font
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Regular/complete/Ubuntu%20Mono%20Nerd%20Font%20Complete%20Mono.ttf
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Regular-Italic/complete/Ubuntu%20Mono%20Italic%20Nerd%20Font%20Complete%20Mono.ttf
@@ -264,126 +271,156 @@
       - name: topicons-redux@pop-planet.info
         url: https://extensions.gnome.org/extension-data/topicons-redux%40pop-planet.info.v6.shell-extension.zip
 
-    is_debian: "{{ ansible_distribution == 'Debian' }}"
-    is_debian_stretch: "{{ ansible_distribution_release == 'stretch' }}"
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
     is_ubuntu_bionic: "{{ ansible_distribution_release == 'bionic' }}"
 
   tasks:
-    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
-    # Linux
+    - name: "[WSL] Get Windows folder"
+      shell: wslpath "$(cmd.exe /c "echo %WINDIR%" 2>/dev/null)"
+      register: windir
+      when: is_wsl
 
-    - name: Create GNOME extension directory
+    - name: "[WSL] Get user's Windows home folder"
+      shell: wslpath "$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null)"
+      register: userprofile
+      when: is_wsl
+
+    - name: "[WSL] Link Windows fonts into WSL"
+      become: yes
+      copy:
+        dest: /etc/fonts/local.conf
+        content: |
+          <?xml version="1.0"?>
+          <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+          <fontconfig>
+              <dir>{{ windir.stdout }}/Fonts</dir>
+              <dir>{{ userprofile.stdout }}/AppData/Local/Microsoft/Windows/Fonts</dir>
+          </fontconfig>
+      when: is_wsl
+
+    - name: "[Non-WSL] Create GNOME extension directory"
       file:
         path: ~/.local/share/gnome-shell/extensions/{{ item.name }}
         state: directory
       register: new_extensions
       loop: "{{ gnome_extensions }}"
-      when: not is_mac and not is_wsl
+      when: not is_wsl
 
-    - name: Extract GNOME extension
+    - name: "[Non-WSL] Extract GNOME extension"
       unarchive:
         src: "{{ item.item.url }}"
         dest: "~/.local/share/gnome-shell/extensions/{{ item.item.name }}"
         creates: "~/.local/share/gnome-shell/extensions/{{ item.item.name }}/metadata.json"
         remote_src: yes
       loop: "{{ new_extensions.results }}"
-      when: not is_mac and not is_wsl and item.changed
+      when: not is_wsl and item.changed
 
-    - name: Enable GNOME extension
+    - name: "[Non-WSL] Enable GNOME extension"
       command: gnome-shell-extension-tool -e "{{ item.item.name }}"
       loop: "{{ new_extensions.results }}"
-      when: not is_mac and not is_wsl and item.changed
+      when: not is_wsl and item.changed
 
-    - name: Install Fonts (via APT)
+    - name: "[Non-WSL] Install Fonts (via APT)"
       become: yes
       apt:
         package: "{{ item }}"
       loop: "{{ fonts_apt }}"
-      when: not is_mac and not is_wsl
+      when: not is_wsl
 
-    - name: Install Microsoft TTF fonts
+    - name: "[Non-WSL] Install Microsoft TTF fonts"
       become: yes
       apt:
         package: ttf-mscorefonts-installer
-      when: not is_mac and not is_wsl and not is_debian
+      when: not is_wsl
 
-    - name: Install Fonts (downloaded)
+    - name: "[Non-WSL] Install Fonts (downloaded)"
       become: yes
       get_url:
         url: "{{ item }}"
         dest: /usr/local/share/fonts/
       loop: "{{ fonts }}"
       register: fonts_downloaded
-      when: not is_mac and not is_wsl
+      when: not is_wsl
 
-    - name: Update font cache
+    - name: "[Non-WSL] Update font cache"
       become: yes
       command: fc-cache -sv
-      when: not is_mac and not is_wsl and fonts_downloaded.changed
+      when: not is_wsl and fonts_downloaded.changed
 
-    - name: Add Gnome themes APT package key
+    - name: "[Non-WSL] Add Gnome themes APT package key"
       become: yes
-      apt_key:
-        keyserver: hkp://keyserver.ubuntu.com:80
-        id: 89993A70
-      when: not is_mac and not is_wsl
+      get_url:
+        url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xd320d0c30b02e64c5b2bb2743766223989993a70
+        dest: /etc/apt/keyrings/ppa_snwh_ppa_{{ distribution_release_snwh }}.asc
+        mode: 0644
+      when: not is_wsl
 
-    - name: Install Gnome Tweaks
+    - name: "[Non-WSL] Install Gnome Tweaks"
       become: yes
       apt:
         package: gnome-tweaks
-      when: not is_mac and not is_wsl and not is_debian_stretch
+      when: not is_wsl
 
-    - name: Install numix Gnome theme
+    - name: "[Non-WSL] Enable chrome-gnome-shell"
+      become: yes
+      apt:
+        package: chrome-gnome-shell
+      when: not is_wsl
+
+    - name: "[Non-WSL] Install numix Gnome theme"
       become: yes
       apt:
         package: numix-gtk-theme
-      when: not is_mac and not is_wsl
+      when: not is_wsl
 
-    - name: Download paper Gnome icon theme
-      get_url:
-        url: https://snwh.org/paper/download.php?owner=snwh&ppa=ppa&pkg=paper-icon-theme,18.04
-        dest: /tmp/paper-icon-theme.deb
-      when: not is_mac and not is_wsl
+    - name: "[Non-WSL] Add paper Gnome icon theme APT package source"
+      become: yes
+      apt_repository:
+        repo: deb [signed-by=/etc/apt/keyrings/ppa_snwh_ppa_{{ distribution_release_snwh }}.asc] http://ppa.launchpad.net/snwh/ppa/ubuntu {{ distribution_release_snwh }} main
+        filename: ppa_snwh_ppa_{{ distribution_release_snwh }}
+        update_cache: no
+      register: apt_repository
+      when: not is_wsl
 
-    - name: Install paper Gnome icon theme
+    - name: "[Non-WSL] Update APT package list"
       become: yes
       apt:
-        deb: /tmp/paper-icon-theme.deb
-      when: not is_mac and not is_wsl
+        update_cache: yes
+      when: not is_wsl and apt_repository.changed
+      register: apt_update
+      retries: 5
+      until: apt_update is success
 
-    - name: Install PIP 2 (Ubuntu 18.04)
+    - name: "[Non-WSL] Install paper Gnome icon theme"
+      become: yes
+      apt:
+        package: "{{ item }}"
+      loop:
+        - paper-icon-theme
+      when: not is_wsl
+
+    - name: "[Ubuntu 18.04] Install PIP 2"
       become: yes
       apt:
         package: python-pip
       when: is_ubuntu_bionic
 
-    - name: Install PIP 3
+    - name: "[Non-WSL] Install PIP 3"
       become: yes
       apt:
         package: python3-pip
-      when: not is_mac and not is_wsl
+      when: not is_wsl
 
-    - name: Install psutil Python package
+    - name: "[Non-WSL] Install psutil Python package"
       become: yes
       pip:
         name: psutil
-      when: not is_mac and not is_wsl
+      when: not is_wsl
 
-    - name: Update customization with dconf
+    - name: "[Non-WSL] Update customization with dconf"
       dconf:
         key: "{{ item.key }}"
         value: "{{ item.value }}"
       loop: "{{ dconf_config }}"
-      when: not is_mac and not is_wsl
-
-    # macOS
-
-    - name: Install Fonts (macOS)
-      get_url:
-        url: "{{ item }}"
-        dest: ~/Library/Fonts/
-      loop: "{{ fonts }}"
-      when: is_mac
+      when: not is_wsl

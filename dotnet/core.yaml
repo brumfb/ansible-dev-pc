@@ -3,29 +3,34 @@
   connection: local
 
   vars:
-    dotnet_versions:
-      - "6.0"
-    dotnet_distribution: "{{ 'ubuntu' if ansible_distribution == 'Pop!_OS' else ansible_distribution | lower }}"
-    dotnet_distribution_version: "{{ ansible_distribution_major_version if ansible_distribution == 'Debian' else ansible_distribution_version }}"    # MSFT uses '19.04' for Ubuntu, and just '10' for Debian
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+    distribution_fallback:
+      'Pop!_OS': 'Ubuntu'
+    distribution: "{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) }}"
+    dotnet_runtime_versions: ["6.0"]
+    dotnet_sdk_version: "7.0"
+    is_ubu_22_04_or_newer: "{{ distribution == 'Ubuntu' and (ansible_distribution_major_version | int) >= 22 }}"
 
   tasks:
-    # Linux
-
     - name: Add Microsoft APT package key
       become: yes
-      apt_key:
+      get_url:
         url: https://packages.microsoft.com/keys/microsoft.asc
-      when: not is_mac
+        dest: /etc/apt/keyrings/microsoft-prod.asc
+        mode: 0644
 
     - name: Add Microsoft APT package repository
       become: yes
       apt_repository:
-        repo: deb [arch=amd64] https://packages.microsoft.com/{{ dotnet_distribution }}/{{ dotnet_distribution_version }}/prod {{ ansible_distribution_release }} main
+        repo: deb [arch=amd64, signed-by=/etc/apt/keyrings/microsoft-prod.asc] https://packages.microsoft.com/{{ distribution | lower }}/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main
         filename: microsoft-prod
         update_cache: no
       register: apt_repository
-      when: not is_mac
+
+    - name: Prefer Microsoft APT package repository
+      become: yes
+      copy:
+        src: 10microsoft
+        dest: /etc/apt/preferences.d/
 
     - name: Update APT package list
       become: yes
@@ -36,49 +41,23 @@
       retries: 5
       until: apt_update is success
 
-    - name: Install .NET SDK (Linux)
+    - name: Install .NET SDK {{ dotnet_sdk_version }}
       become: yes
       apt:
-        package: dotnet-sdk-{{ item }}
+        package: dotnet-sdk-{{ dotnet_sdk_version }}
       register: dotnet_sdk_installed_linux
-      loop: "{{ dotnet_versions }}"
-      when: not is_mac
 
-    - name: Perform first-run experience (Linux)
+    - name: Install ASP.NET Runtime
+      become: yes
+      apt:
+        package: aspnetcore-runtime-{{ item }}
+      loop: "{{ dotnet_runtime_versions }}"
+
+    - name: Perform first-run experience
       command: dotnet new
       when: dotnet_sdk_installed_linux.changed
 
-    # macOS
-
-    - name: Install .NET SDK installer
-      get_url:
-        url: https://dot.net/v1/dotnet-install.sh
-        dest: ~/bin/dotnet-install
-        mode: 0755
-      when: is_mac
-
-    - name: Install .NET SDK (macOS)
-      shell: ~/bin/dotnet-install -c {{ item }}
-      register: dotnet_sdk_installed_mac
-      loop: "{{ dotnet_versions }}"
-      args:
-        creates: ~/.dotnet/sdk/{{ item }}.*/.version
-      when: is_mac
-
-    - name: Create shortcut to dotnet
-      file:
-        path: ~/bin/dotnet
-        src: ~/.dotnet/dotnet
-        state: link
-      when: is_mac
-
-    - name: Perform first-run experience (macOS)
-      command: ~/bin/dotnet new
-      when: dotnet_sdk_installed_mac.changed
-
-    # Common
-
-    - name: Update environment for .NET Core
+    - name: Update environment for .NET
       blockinfile:
         path: ~/.bashrc
         marker: "### {mark} Ansible managed: .NET Core enhancement"

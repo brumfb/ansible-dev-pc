@@ -1,4 +1,4 @@
-- name: .NET Core
+- name: .NET (customization)
   hosts: 127.0.0.1
   connection: local
 
@@ -11,6 +11,6 @@
         - coverlet.console
         - dotnet-depends
         - dotnet-format
-        - dotnet-outdated
+        - dotnet-outdated-tool
         - dotnet-reportgenerator-globaltool
         - dotnet-retire

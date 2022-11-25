@@ -1,42 +1,62 @@
+- import_playbook: ../rust-lang/core.yaml    # Need cargo to install Alacritty
+
 - name: Alacritty
   hosts: 127.0.0.1
   connection: local
 
-  vars:
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
-    is_popos: "{{ not is_mac and 'Pop!_OS' in hostvars[inventory_hostname].ansible_facts.lsb.description }}"
-    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' or ansible_distribution == 'Pop!_OS' }}"
-
   tasks:
-    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
-    # Linux
-
-    - name: Add APT package source (Ubuntu)
-      become: yes
-      apt_repository:
-        repo: ppa:mmstick76/alacritty
-      register: apt_repository
-      when: is_ubuntu and not is_wsl and not is_popos
-
-    - name: Update APT package list
+    - name: "[Non-WSL] Install pre-requisites"
       become: yes
       apt:
-        update_cache: yes
-      when: apt_repository.changed
-      register: apt_update
-      retries: 5
-      until: apt_update is success
+        package: "{{ item }}"
+      loop:
+        - cmake
+        - libfontconfig1-dev
+        - libfreetype6-dev
+        - libxcb-xfixes0-dev
+        - libxkbcommon-dev
+        - pkg-config
+        - python3
+      when: not is_wsl
 
-    - name: Install Alacritty (Linux)
-      become: yes
-      apt:
-        package: alacritty
-      when: is_ubuntu and not is_wsl
+    - name: "[Non-WSL] Install Alacritty"
+      command: ~/.cargo/bin/cargo install alacritty
+      args:
+        creates: ~/.cargo/bin/alacritty
+      when: not is_wsl
 
-    # macOS
+    - name: "[Non-WSL] Ensure local applications folder exists"
+      file:
+        path: ~/.local/share/applications
+        state: directory
+      when: not is_wsl
 
-    - name: Install Alacritty (macOS)
-      homebrew_cask:
-        name: alacritty
-      when: is_mac
+    - name: "[Non-WSL] Add Alacritty desktop file"
+      copy:
+        src: alacritty.desktop
+        dest: ~/.local/share/applications/alacritty.desktop
+      when: not is_wsl
+
+    - name: "[Non-WSL] Find Alacritty icon file"
+      find:
+        paths: ~/.cargo/registry/src
+        patterns: alacritty.png
+        recurse: yes
+      register: alacritty_icons
+      when: not is_wsl
+
+    - name: "[Non-WSL] Update Alacritty desktop file for binary"
+      replace:
+        path: ~/.local/share/applications/alacritty.desktop
+        regexp: __HOME__
+        replace: "{{ lookup('env', 'HOME') }}"
+      when: not is_wsl
+
+    - name: "[Non-WSL] Update Alacritty desktop file for icon"
+      replace:
+        path: ~/.local/share/applications/alacritty.desktop
+        regexp: __ICON__
+        replace: "{{ alacritty_icons.files[0].path }}"
+      when: not is_wsl

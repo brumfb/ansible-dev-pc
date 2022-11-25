@@ -15,3 +15,27 @@
             _images=$(docker images --all --quiet --filter 'dangling=true')
             [[ -z ${_images// } ]] || docker rmi $_images
           }
+          docker-start() {
+            [ -S /var/run/docker.sock ] || sudo service docker start
+          }
+          docker-stop() {
+            [ ! -S /var/run/docker.sock ] || sudo service docker stop
+          }
+
+    - name: Ensure configuration folder exists
+      become: yes
+      file:
+        path: /etc/docker
+        state: directory
+
+    - name: Configure default Docker network
+      become: yes
+      copy:
+        dest: /etc/docker/daemon.json
+        content: |
+          {
+            "default-address-pools": [
+              { "base": "192.168.240.0/20", "size": 24 }
+            ],
+            "experimental": true
+          }

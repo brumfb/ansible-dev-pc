@@ -3,53 +3,56 @@
   connection: local
 
   vars:
-    docker_distribution: "{{ 'ubuntu' if ansible_distribution == 'Pop!_OS' else ansible_distribution | lower }}"
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+    distribution_fallback:
+      'Pop!_OS': 'Ubuntu'
 
   tasks:
-    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
-    # Linux
+    - name: Determine Docker Compose latest version
+      shell:
+        cmd: "curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -i \"browser_download_url.*linux-x86_64\\\"\" | cut -d : -f 2,3 | tr -d \\\""
+        warn: false
+      register: docker_compose_version
 
-    - name: Install Docker pre-requisites
+    - name: Install Docker Compose
       become: yes
-      apt:
-        package: gnupg-agent
-      when: not is_mac and not is_wsl
+      get_url:
+        url: "{{ docker_compose_version.stdout }}"
+        dest: /usr/local/bin/docker-compose
+        mode: 0755
 
     - name: Add Docker APT package key
       become: yes
-      apt_key:
-        url: https://download.docker.com/linux/{{ docker_distribution }}/gpg
-      when: not is_mac and not is_wsl
+      get_url:
+        url: https://download.docker.com/linux/{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) | lower }}/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: 0644
 
     - name: Add Docker APT package repository
       become: yes
       apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/{{ docker_distribution }} {{ ansible_distribution_release }} stable
+        repo: deb [arch=amd64, signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) | lower }} {{ ansible_distribution_release }} stable
         filename: docker
         update_cache: no
-      register: apt_repository
-      when: not is_mac and not is_wsl
+      register: apt_repository_docker
 
     - name: Update APT package list
       become: yes
       apt:
         update_cache: yes
-      when: apt_repository.changed
+      when: apt_repository_docker.changed
       register: apt_update
       retries: 5
       until: apt_update is success
 
-    - name: Install Docker (Linux)
+    - name: Install Docker engine
       become: yes
       apt:
         package: "{{ item }}"
       loop:
         - docker-ce
         - docker-ce-cli
-        - docker-compose
-      when: not is_mac and not is_wsl
 
     - name: Enable Docker engine for current user
       become: yes
@@ -57,16 +60,16 @@
         name={{ lookup('env', "USER") }}
         groups=docker
         append=yes
-      when: not is_mac and not is_wsl
 
-    # macOS
+    - name: Determine Docker Machine latest version
+      shell:
+        cmd: "curl -s https://api.github.com/repos/docker/machine/releases/latest | grep \"browser_download_url.*Linux-x86_64\\\"\" | cut -d : -f 2,3 | tr -d \\\""
+        warn: false
+      register: docker_machine_version
 
-    - name: Install Docker CLI components (macOS)
-      homebrew:
-        name: docker-compose
-      when: is_mac
-
-    - name: Install Docker engine (macOS)
-      homebrew_cask:
-        name: docker
-      when: is_mac
+    - name: Install Docker Machine
+      become: yes
+      get_url:
+        url: "{{ docker_machine_version.stdout }}"
+        dest: /usr/local/bin/docker-machine
+        mode: 0755

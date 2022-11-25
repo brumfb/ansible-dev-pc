@@ -3,15 +3,22 @@
   connection: local
 
   vars:
-    ruby_version: 2.7.1
+    ruby_version_primary: 3.1.1
+    ruby_versions:
+    - 2.7.5
+    - "{{ ruby_version_primary }}"
 
   tasks:
-    - name: Install Ruby {{ ruby_version }}
-      shell: ~/.rbenv/bin/rbenv install {{ ruby_version }}
-      args:
-        creates: ~/.rbenv/versions/{{ ruby_version }}/bin/ruby
-      register: ruby_install
+    # Need to update versions in case this is being re-run to get a newer Ruby
+    - name: Update available Ruby versions
+      shell: git -C ~/.rbenv/plugins/ruby-build pull
+      ignore_errors: yes
 
-    - name: Use Ruby {{ ruby_version }} by default
-      shell: ~/.rbenv/bin/rbenv global {{ ruby_version }}
-      when: ruby_install.changed
+    - name: Install Ruby
+      shell: ~/.rbenv/bin/rbenv install {{ item }}
+      args:
+        creates: ~/.rbenv/versions/{{ item }}/bin/ruby
+      loop: "{{ ruby_versions }}"
+
+    - name: Use Ruby {{ ruby_version_primary }} by default
+      shell: ~/.rbenv/bin/rbenv global {{ ruby_version_primary }}

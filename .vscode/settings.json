@@ -4,7 +4,11 @@
       "**/.git": true,
       "*.retry": true
     },
-    "files.associations": {
-      "*.yaml": "ansible"
-    }
+    "cSpell.words": [
+      "affordances",
+      "distro",
+      "distros",
+      "Insync",
+      "sudoer"
+    ]
 }

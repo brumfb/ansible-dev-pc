@@ -18,10 +18,6 @@
 
 ##### Developer tools
 
-- import_playbook: ansible/vscode.yaml
-
-- import_playbook: azure/vscode.yaml
-
 - import_playbook: docker/customization.yaml
 - import_playbook: docker/vscode.yaml
 
@@ -32,9 +28,6 @@
 - import_playbook: git/vscode.yaml
 
 - import_playbook: golang/vscode.yaml
-
-- import_playbook: kubectl/customization.yaml
-- import_playbook: kubectl/vscode.yaml
 
 - import_playbook: mono/vscode.yaml
 
@@ -49,6 +42,8 @@
 
 - import_playbook: ruby/customization.yaml
 - import_playbook: ruby/vscode.yaml
+
+- import_playbook: rust-lang/vscode.yaml
 
 ##### Applications (free)
 

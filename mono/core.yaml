@@ -3,32 +3,28 @@
   connection: local
 
   vars:
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
-
-    # Mono only ships packages for LTS versions of Ubuntu, so we need to stick to 18.04 (Bionic)
-    mono_distribution: "{{ 'ubuntu' if ansible_distribution == 'Pop!_OS' else ansible_distribution | lower }}"
-    mono_distribution_release: "{{ ansible_distribution_release if ansible_distribution == 'Debian' else 'bionic' }}"
+    distribution_fallback:
+      'Pop!_OS': 'Ubuntu'
+    distribution_release_fallback:
+      'jammy': 'focal'
 
   tasks:
-    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
-
-    # Linux
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
     - name: Add Mono APT package key
       become: yes
-      apt_key:
-        keyserver: hkp://keyserver.ubuntu.com:80
-        id: 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-      when: not is_mac
+      get_url:
+        url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3fa7e0328081bff6a14da29aa6a19b38d3d831ef
+        dest: /etc/apt/keyrings/mono-official-stable.asc
+        mode: 0644
 
     - name: Add Mono APT package repository
       become: yes
       apt_repository:
-        repo: deb https://download.mono-project.com/repo/{{ mono_distribution }} stable-{{ mono_distribution_release }} main
+        repo: deb [arch=amd64, signed-by=/etc/apt/keyrings/mono-official-stable.asc] https://download.mono-project.com/repo/{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) | lower }} stable-{{ distribution_release_fallback[ansible_distribution_release] | default(ansible_distribution_release) }} main
         filename: mono-official-stable
         update_cache: no
       register: apt_repository
-      when: not is_mac
 
     - name: Update APT package list
       become: yes
@@ -39,7 +35,7 @@
       retries: 5
       until: apt_update is success
 
-    - name: Install Mono (Linux)
+    - name: Install Mono
       become: yes
       apt:
         package: "{{ item }}"
@@ -47,16 +43,16 @@
         - mono-complete
         - mono-vbnc
       register: mono_install
-      when: not is_mac
 
-    - name: Disable Mono binfmt on WSL
+    - name: "[WSL] Disable .NET app auto-run with Mono (now)"
       become: yes
       shell: update-binfmts --disable cli
-      when: is_wsl and mono_install.changed
+      when: is_wsl
 
-    # macOS
-
-    - name: Install Mono (macOS)
-      homebrew:
-        name: mono
-      when: is_mac
+    - name: "[WSL] Disable .NET app auto-run with Mono (on startup)"
+      blockinfile:
+        path: ~/.bashrc
+        marker: "### {mark} Ansible managed: Disable Mono auto-run for Windows apps (WSL)"
+        block: |
+          sudo update-binfmts --disable cli
+      when: is_wsl

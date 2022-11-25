@@ -3,51 +3,62 @@
   connection: local
 
   vars:
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
-    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' or ansible_distribution == 'Pop!_OS' }}"
+    distribution_fallback:
+      'Pop!_OS': 'Ubuntu'
+    distribution_release_fallback:
+      'focal': 'bionic'
+      'jammy': 'bionic'
 
   tasks:
-    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
-    # Linux
+    - name: "[WSL] Get user's Windows home path"
+      shell: wslpath "$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null)"
+      register: userprofile
+      when: is_wsl
 
-    - name: Add Insync APT package key (Ubuntu)
+    - name: "[WSL] Check for Google Drive folder"
+      stat:
+        path: "{{ userprofile.stdout }}/Google Drive"
+      register: gdrive_path
+      when: is_wsl
+
+    - name: "[WSL] Create symlink to ~/gdrive"
+      file:
+        path: ~/gdrive
+        src: "{{ userprofile.stdout }}/Google Drive"
+        state: link
+      when: is_wsl and gdrive_path.stat.exists
+
+    - name: "[Non-WSL] Add Insync APT package key"
       become: yes
-      apt_key:
-        keyserver: hkp://keyserver.ubuntu.com:80
-        id: ACCAF35C
-      when: is_ubuntu and not is_wsl
+      get_url:
+        url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xaeeb94e9c5a3b54ecfa4a66aa684470caccaf35c
+        dest: /etc/apt/keyrings/insync.asc
+        mode: 0644
+      when: not is_wsl
 
-    - name: Add Insync APT package repository (Ubuntu)
+    - name: "[Non-WSL] Add Insync APT package repository"
       become: yes
       apt_repository:
-        repo: deb http://apt.insynchq.com/ubuntu bionic non-free contrib
+        repo: deb [signed-by=/etc/apt/keyrings/insync.asc] http://apt.insynchq.com/{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) | lower }} {{ distribution_release_fallback[ansible_distribution_release] | default(ansible_distribution_release) }} non-free contrib
         filename: insync
         update_cache: no
       register: apt_repository
-      when: is_ubuntu and not is_wsl
+      when: not is_wsl
 
-    - name: Update APT package list (Ubuntu)
+    - name: "[Non-WSL] Update APT package list"
       become: yes
       apt:
         update_cache: yes
       when: apt_repository.changed
       register: apt_update
       retries: 5
-      until: apt_update is success
 
-    - name: Install Insync (Ubuntu)
+    - name: "[Non-WSL] Install Insync"
       become: yes
       apt:
         package: "{{ item }}"
       loop:
         - insync
-        - insync-nautilus
-      when: is_ubuntu and not is_wsl
-
-    # macOS
-
-    - name: Install Google Backup and Sync (macOS)
-      homebrew_cask:
-        name: google-backup-and-sync
-      when: is_mac
+      when: not is_wsl
