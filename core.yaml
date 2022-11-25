@@ -55,7 +55,7 @@
         - curl
         - dconf-editor
         - exfat-fuse
-        - exfat-utils
+        - exfatprogs
         - htop
         - inetutils-traceroute
         - jq
