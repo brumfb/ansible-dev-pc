@@ -1,0 +1,42 @@
+- name: neovim
+  hosts: 127.0.0.1
+  connection: local
+
+  vars:
+    neovim_version: "0.8.1"
+    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
+  tasks:
+    - name: Creating neovim folder
+      become: yes
+      file:
+        path: /opt/nvim
+        state: directory
+
+    - name: Download neovim
+      delegate_to: localhost
+      become: yes
+      get_url:
+        url: "https://github.com/neovim/neovim/releases/download/v{{ neovim_version }}/nvim.appimage"
+        dest: "/opt/nvim"
+        headers:
+          Accept: "application/octet-stream"
+        checksum: "sha256:https://github.com/neovim/neovim/releases/download/v{{ neovim_version }}/nvim.appimage.sha256sum"
+        mode: 0755
+
+    - name: Create symlink to /usr/local/vim
+      become: yes
+      file:
+        path: /usr/local/bin/vim
+        src: /opt/nvim/nvim.appimage
+        state: link
+
+    - name: Create symlink to /usr/local/nvim
+      become: yes
+      file:
+        path: /usr/local/bin/nvim
+        src: /opt/nvim/nvim.appimage
+        state: link
+
+
+

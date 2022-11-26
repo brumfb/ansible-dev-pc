@@ -60,6 +60,9 @@
 # rust-lang
 - import_playbook: rust-lang/core.yaml
 
+# neovim
+- import_playbook: neovim/core.yaml
+
 ##### Applications (free)
 
 # Alacritty (high performance terminal application)
