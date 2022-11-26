@@ -137,6 +137,35 @@
           GIT_PROMPT_SYMBOLS_NO_REMOTE_TRACKING="\`echoColor 25 227\` "
           GIT_PROMPT_SYMBOLS_PREHASH=":"
 
+    - name: Customer .gitconfig
+      blockinfile:
+        path: ~/.gitconfig
+        marker: "### {mark} Ansible managed: .gitconfig customization"
+        block: |
+          [alias]
+            amend = commit -a --amend
+            bclean = "!f() { git branch --merged ${1-main} | grep -v " ${1-main}$" | xargs git branch -d; }; f"
+            bdone = "!f() { git checkout ${1-main} && git up && git bclean ${1-main}; }; f"
+            cm = !git add -A && git commit -m
+            co = checkout
+            cob = checkout -b
+            ec = config --global -e
+            h = !git log --graph --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n'' %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
+            l = log --pretty=format:\"%h %ad | %s%d [%an]\" --date=short
+            lg = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+            out = log --pretty=format:\"%h %ad | %s%d [%an]\" --date=short @{u}..
+            pr = "!f() { git fetch origin refs/pull/$1/head:pr/$1; } ; f"
+            save = !git add -A && git commit -m 'SAVEPOINT'
+            scorch = clean -xdf -e packages -e .nuget -e nuget.exe -e *.dbmdl -e *.suo -e *.user -e .vs -e .vagrant -e .dotnet -e .idea -e .vscode
+            skip = rebase --skip
+            st = status
+            stats = diff --stat
+            sup = !git submodule foreach 'git pull origin master'
+            undo = reset HEAD~1 --mixed
+            up = !git pull --rebase --prune $@ && git submodule update --init --recursive
+            wip = !git add -u && git commit -m "WIP"
+            wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
+
     - name: Ensure ~/.config exists
       file:
         path: ~/.config
