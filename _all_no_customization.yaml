@@ -33,9 +33,6 @@
 # git
 - import_playbook: git/core.yaml
 
-# GitHub
-- import_playbook: github/gh.yaml
-
 # golang
 - import_playbook: golang/core.yaml
 

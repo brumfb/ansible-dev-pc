@@ -39,6 +39,8 @@
       copy:
         src: settings.json
         dest: ~/.config/Code/User/settings.json
+        unsafe_writes: true                               # Would get invalid cross-device links, see https://github.com/ansible/ansible/issues/73310
+
 
     - name: Override default VS Code key bindings
       copy:
