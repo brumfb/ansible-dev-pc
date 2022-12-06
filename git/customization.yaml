@@ -140,6 +140,7 @@
     - name: Customer .gitconfig
       blockinfile:
         path: ~/.gitconfig
+        create: true
         marker: "### {mark} Ansible managed: .gitconfig customization"
         block: |
           [alias]
