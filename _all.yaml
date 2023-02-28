@@ -16,6 +16,10 @@
 - import_playbook: customization-text.yaml
 - import_playbook: customization-ui.yaml
 
+
+# starship
+- import_playbook: starship/core.yaml
+
 ##### Developer tools
 
 - import_playbook: docker/customization.yaml
