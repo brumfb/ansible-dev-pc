@@ -31,17 +31,10 @@
 
 - import_playbook: mono/vscode.yaml
 
-- import_playbook: no-screen-blank/core.yaml
-
 - import_playbook: nodejs/customization.yaml
 - import_playbook: nodejs/vscode.yaml
 
-- import_playbook: powershell-core/vscode.yaml
-
 - import_playbook: python/vscode.yaml
-
-- import_playbook: ruby/customization.yaml
-- import_playbook: ruby/vscode.yaml
 
 - import_playbook: rust-lang/vscode.yaml
 
