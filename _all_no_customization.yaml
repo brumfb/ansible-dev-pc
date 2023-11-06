@@ -16,7 +16,7 @@
 ##### Developer tools
 
 # Visual Studio Code
-# - import_playbook: vscode/core.yaml
+- import_playbook: vscode/core.yaml
 
 # # Docker
 # - import_playbook: docker/core.yaml

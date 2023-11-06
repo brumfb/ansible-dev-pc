@@ -2,13 +2,26 @@
   hosts: 127.0.0.1
   connection: local
 
+  vars:
+    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
   tasks:
+    # Common
     - name: Ensure ~/.config folder exists
       file:
         path: ~/.config
         state: directory
         mode: 0700
 
+    # macOS-
+    - name: Link '~/Library/Application Support/Code' to '~/.config/Code' (macOS)
+      file:
+        path: ~/.config/Code
+        src: ~/Library/Application Support/Code
+        state: link
+      when: is_mac
+
+    # Linux
     - name: Install VS Live Share dependencies
       become: yes
       apt:
@@ -19,6 +32,7 @@
         - libsecret-1-0
         - desktop-file-utils
         - x11-utils
+      when: not is_mac
 
     - name: Install VS Code extensions
       command: ./invoke-code --install-extension {{ item }}
@@ -27,7 +41,7 @@
       loop:
         - amodio.toggle-excluded-files                    # Toggle Excluded Files
         - editorconfig.editorconfig                       # EditorConfig for VS Code
-        - ms-vsliveshare.vsliveshare-pack                 # Live Share Extension Pack
+        - ms-vsliveshare.vsliveshare                      # Live Share Extension Pack
         - ms-vscode-remote.vscode-remote-extensionpack    # Remote Development
         - pkief.material-icon-theme                       # Material Icon Theme
         - pflannery.vscode-versionlens                    # Version Lens
@@ -40,7 +54,6 @@
         src: settings.json
         dest: ~/.config/Code/User/settings.json
         unsafe_writes: true                               # Would get invalid cross-device links, see https://github.com/ansible/ansible/issues/73310
-
 
     - name: Override default VS Code key bindings
       copy:
