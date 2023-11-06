@@ -271,10 +271,13 @@
       - name: topicons-redux@pop-planet.info
         url: https://extensions.gnome.org/extension-data/topicons-redux%40pop-planet.info.v6.shell-extension.zip
 
+    is_debian: "{{ ansible_distribution == 'Debian' }}"
+    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' or ansible_distribution == 'Pop!_OS' }}"
     is_ubuntu_bionic: "{{ ansible_distribution_release == 'bionic' }}"
 
   tasks:
-    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
     - name: "[WSL] Get Windows folder"
       shell: wslpath "$(cmd.exe /c "echo %WINDIR%" 2>/dev/null)"
@@ -299,106 +302,108 @@
           </fontconfig>
       when: is_wsl
 
-    - name: "[Non-WSL] Create GNOME extension directory"
+    # Linux
+
+    - name: "Create GNOME extension directory"
       file:
         path: ~/.local/share/gnome-shell/extensions/{{ item.name }}
         state: directory
       register: new_extensions
       loop: "{{ gnome_extensions }}"
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Extract GNOME extension"
+    - name: "Extract GNOME extension"
       unarchive:
         src: "{{ item.item.url }}"
         dest: "~/.local/share/gnome-shell/extensions/{{ item.item.name }}"
         creates: "~/.local/share/gnome-shell/extensions/{{ item.item.name }}/metadata.json"
         remote_src: yes
       loop: "{{ new_extensions.results }}"
-      when: not is_wsl and item.changed
+      when: not is_mac and not is_wsl and item.changed
 
-    - name: "[Non-WSL] Enable GNOME extension"
+    - name: "Enable GNOME extension"
       command: gnome-shell-extension-tool -e "{{ item.item.name }}"
       loop: "{{ new_extensions.results }}"
-      when: not is_wsl and item.changed
+      when: not is_mac and not is_wsl and item.changed
 
-    - name: "[Non-WSL] Install Fonts (via APT)"
+    - name: "Install Fonts (via APT)"
       become: yes
       apt:
         package: "{{ item }}"
       loop: "{{ fonts_apt }}"
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Install Microsoft TTF fonts"
+    - name: "Install Microsoft TTF fonts"
       become: yes
       apt:
         package: ttf-mscorefonts-installer
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Install Fonts (downloaded)"
+    - name: "Install Fonts (downloaded)"
       become: yes
       get_url:
         url: "{{ item }}"
         dest: /usr/local/share/fonts/
       loop: "{{ fonts }}"
       register: fonts_downloaded
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Update font cache"
+    - name: "[Update font cache"
       become: yes
       command: fc-cache -sv
-      when: not is_wsl and fonts_downloaded.changed
+      when: not is_mac and not is_wsl and fonts_downloaded.changed
 
-    - name: "[Non-WSL] Add Gnome themes APT package key"
+    - name: "Add Gnome themes APT package key"
       become: yes
       get_url:
         url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xd320d0c30b02e64c5b2bb2743766223989993a70
         dest: /etc/apt/keyrings/ppa_snwh_ppa_{{ distribution_release_snwh }}.asc
         mode: 0644
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Install Gnome Tweaks"
+    - name: "Install Gnome Tweaks"
       become: yes
       apt:
         package: gnome-tweaks
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Enable chrome-gnome-shell"
+    - name: "Enable chrome-gnome-shell"
       become: yes
       apt:
         package: chrome-gnome-shell
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Install numix Gnome theme"
+    - name: "Install numix Gnome theme"
       become: yes
       apt:
         package: numix-gtk-theme
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Add paper Gnome icon theme APT package source"
+    - name: "Add paper Gnome icon theme APT package source"
       become: yes
       apt_repository:
         repo: deb [signed-by=/etc/apt/keyrings/ppa_snwh_ppa_{{ distribution_release_snwh }}.asc] http://ppa.launchpad.net/snwh/ppa/ubuntu {{ distribution_release_snwh }} main
         filename: ppa_snwh_ppa_{{ distribution_release_snwh }}
         update_cache: no
       register: apt_repository
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Update APT package list"
+    - name: "Update APT package list"
       become: yes
       apt:
         update_cache: yes
-      when: not is_wsl and apt_repository.changed
+      when: is_ubuntu and not is_wsl and apt_repository.changed
       register: apt_update
       retries: 5
       until: apt_update is success
 
-    - name: "[Non-WSL] Install paper Gnome icon theme"
+    - name: "Install paper Gnome icon theme"
       become: yes
       apt:
         package: "{{ item }}"
       loop:
         - paper-icon-theme
-      when: not is_wsl
+      when: is_ubuntu and not is_wsl
 
     - name: "[Ubuntu 18.04] Install PIP 2"
       become: yes
@@ -406,21 +411,29 @@
         package: python-pip
       when: is_ubuntu_bionic
 
-    - name: "[Non-WSL] Install PIP 3"
+    - name: "Install PIP 3"
       become: yes
       apt:
         package: python3-pip
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Install psutil Python package"
+    - name: "Install psutil Python package"
       become: yes
       pip:
         name: psutil
-      when: not is_wsl
+      when: not is_mac and not is_wsl
 
-    - name: "[Non-WSL] Update customization with dconf"
+    - name: "Update customization with dconf"
       dconf:
         key: "{{ item.key }}"
         value: "{{ item.value }}"
       loop: "{{ dconf_config }}"
-      when: not is_wsl
+      when: not is_mac and not is_wsl
+
+  # macOS
+    - name: Install Fonts (macOS)
+      get_url:
+        url: "{{ item }}"
+        dest: ~/Library/Fonts/
+      loop: "{{ fonts }}"
+      when: is_mac

@@ -2,23 +2,29 @@
   hosts: 127.0.0.1
   connection: local
 
+  vars:
+    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
   tasks:
-    - name: Remove old common bash aliases
+    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    
+  # Common
+    - name: Remove old common bash aliases (common)
       blockinfile:
         path: ~/.bashrc
         marker: "### {mark} Ansible managed: Bash aliases (common)"
         state: absent
 
-    - name: Remove old Linux bash aliases
+    - name: Remove old Linux bash aliases (common)
       blockinfile:
         path: ~/.bashrc
         marker: "### {mark} Ansible managed: Bash aliases (Linux)"
         state: absent
 
-    - name: Add bash aliases
+    - name: Add bash aliases (common)
       blockinfile:
         path: ~/.bashrc
-        marker: "### {mark} Ansible managed: Bash aliases"
+        marker: "### {mark} Ansible managed: Bash aliases (common)"
         block: |
           alias diff='colordiff'
           alias dir='ls -lA'
@@ -36,6 +42,18 @@
 
           alias gpg-stop='gpgconf --kill gpg-agent'
 
+  # Linux
+    
+    - name: Add bash aliases (Linux)
+      blockinfile:
+        path: ~/.bashrc
+        marker: "### {mark} Ansible managed: Bash aliases (Linux)"
+        block: |
+           alias clip='xclip -selection clipboard'
+           alias grep='grep --color=auto'
+           alias ls='ls -Fh --color'
+      when: not is_mac
+
     - name: Install APT packages
       become: yes
       apt:
@@ -44,7 +62,31 @@
         - colordiff
         - fortune
         - neofetch
+      when: not is_mac
 
+  # macOS
+
+    - name: Add bash aliases (macOS)
+      blockinfile:
+        path: ~/.bashrc
+        marker: "### {mark} Ansible managed: Bash aliases (macOS)"
+        block: |
+          alias clip='pbcopy'
+          alias grep='grep --colour=auto'
+          alias ls='ls -GFh'
+      when: is_mac
+
+    - name: Install Homebrew packages
+      homebrew:
+        name: "{{ item }}"
+      loop:
+        - colordiff
+        - fortune
+        - neofetch
+      when: is_mac
+
+  # Common
+  
     - name: Ensure neofetch configuration folder exists
       file:
         path: ~/.config/neofetch
