@@ -25,7 +25,7 @@
         line: export PATH=$PATH:~/bin
 
   # Linux
-   - name: Create /etc/apt/keyrings
+    - name: Create /etc/apt/keyrings
       become: yes
       file:
         path: /etc/apt/keyrings
@@ -58,6 +58,7 @@
       become: yes
       apt:
         upgrade: yes
+      when: not is_mac
 
     - name: Install core packages
       become: yes

@@ -16,39 +16,39 @@
 ##### Developer tools
 
 # Visual Studio Code
-- import_playbook: vscode/core.yaml
+# - import_playbook: vscode/core.yaml
 
-# Docker
-- import_playbook: docker/core.yaml
+# # Docker
+# - import_playbook: docker/core.yaml
 
-# .NET
-- import_playbook: dotnet/core.yaml
+# # .NET
+# - import_playbook: dotnet/core.yaml
 
-# git
-- import_playbook: git/core.yaml
+# # git
+# - import_playbook: git/core.yaml
 
-# golang
-- import_playbook: golang/core.yaml
+# # golang
+# - import_playbook: golang/core.yaml
 
-# Mono (.NET Framework)
-# - import_playbook: mono/core.yaml
+# # Mono (.NET Framework)
+# # - import_playbook: mono/core.yaml
 
-# NodeJS
-- import_playbook: nodejs/core.yaml
+# # NodeJS
+# - import_playbook: nodejs/core.yaml
 
-# Postman
-- import_playbook: postman/core.yaml
+# # Postman
+# - import_playbook: postman/core.yaml
 
-# Python
-- import_playbook: python/core.yaml
+# # Python
+# - import_playbook: python/core.yaml
 
-# rust-lang
-- import_playbook: rust-lang/core.yaml
+# # rust-lang
+# - import_playbook: rust-lang/core.yaml
 
-# neovim
-- import_playbook: neovim/core.yaml
+# # neovim
+# - import_playbook: neovim/core.yaml
 
-##### Applications (free)
+# ##### Applications (free)
 
-# Alacritty (high performance terminal application)
-- import_playbook: alacritty/core.yaml
+# # Alacritty (high performance terminal application)
+# - import_playbook: alacritty/core.yaml
