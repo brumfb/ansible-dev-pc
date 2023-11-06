@@ -12,7 +12,7 @@
   tasks:
     - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
-  # Common  
+  # Common
     - name: Create ~/bin
       file:
         path: ~/bin
@@ -154,7 +154,8 @@
         name: "{{ item }}"
       loop:
         - gnu-tar
-        
+      when: is_mac
+
     - name: Add GNU tar to the PATH
       lineinfile:
         path: ~/.bashrc
