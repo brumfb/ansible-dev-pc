@@ -21,8 +21,8 @@
 # Docker
 - import_playbook: docker/core.yaml
 
-# # .NET
-# - import_playbook: dotnet/core.yaml
+# .NET
+- import_playbook: dotnet/core.yaml
 
 # # git
 # - import_playbook: git/core.yaml

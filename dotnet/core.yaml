@@ -9,14 +9,17 @@
     dotnet_runtime_versions: ["6.0"]
     dotnet_sdk_version: "7.0"
     is_ubu_22_04_or_newer: "{{ distribution == 'Ubuntu' and (ansible_distribution_major_version | int) >= 22 }}"
+    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
 
   tasks:
+    # Linux
     - name: Add Microsoft APT package key
       become: yes
       get_url:
         url: https://packages.microsoft.com/keys/microsoft.asc
         dest: /etc/apt/keyrings/microsoft-prod.asc
         mode: 0644
+      when: not is_mac
 
     - name: Add Microsoft APT package repository
       become: yes
@@ -25,12 +28,14 @@
         filename: microsoft-prod
         update_cache: no
       register: apt_repository
+      when: not is_mac
 
     - name: Prefer Microsoft APT package repository
       become: yes
       copy:
         src: 10microsoft
         dest: /etc/apt/preferences.d/
+      when: not is_mac
 
     - name: Update APT package list
       become: yes
@@ -41,22 +46,58 @@
       retries: 5
       until: apt_update is success
 
-    - name: Install .NET SDK {{ dotnet_sdk_version }}
+    - name: Install .NET SDK {{ dotnet_sdk_version }} (Linux)
       become: yes
       apt:
         package: dotnet-sdk-{{ dotnet_sdk_version }}
       register: dotnet_sdk_installed_linux
+      when: not is_mac
 
-    - name: Install ASP.NET Runtime
+    - name: Install ASP.NET Runtime (Linux)
       become: yes
       apt:
         package: aspnetcore-runtime-{{ item }}
       loop: "{{ dotnet_runtime_versions }}"
+      when: not is_mac
 
-    - name: Perform first-run experience
+    - name: Perform first-run experience (Linux)
       command: dotnet new
       when: dotnet_sdk_installed_linux.changed
 
+    # macOS
+    - name: Install .NET SDK installer
+      get_url:
+        url: https://dot.net/v1/dotnet-install.sh
+        dest: ~/bin/dotnet-install
+        mode: 0755
+      when: is_mac
+
+    - name: Install .NET SDK {{ dotnet_sdk_version }} (macOS)
+      shell: ~/bin/dotnet-install -c {{ dotnet_sdk_version }}
+      register: dotnet_sdk_installed_mac
+      args:
+        creates: ~/.dotnet/sdk/{{ dotnet_sdk_version }}.*/.version
+      when: is_mac
+
+    - name: Install ASP.NET Runtime (macOS)
+      shell: ~/bin/dotnet-install -c {{ item }} --runtime aspnetcore
+      loop: "{{ dotnet_runtime_versions }}"
+      args:
+        creates: ~/.dotnet/shared/Microsoft.NETCore.App/{{ item }}.*/.version
+      when: is_mac
+
+    - name: Create shortcut to dotnet
+      file:
+        path: ~/bin/dotnet
+        src: ~/.dotnet/dotnet
+        state: link
+      when: is_mac
+
+    - name: Perform first-run experience (macOS)
+      command: ~/bin/dotnet new
+      when: dotnet_sdk_installed_mac.changed
+
+    # Common
     - name: Update environment for .NET
       blockinfile:
         path: ~/.bashrc

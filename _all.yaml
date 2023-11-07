@@ -21,8 +21,8 @@
 - import_playbook: docker/customization.yaml
 - import_playbook: docker/vscode.yaml
 
-# - import_playbook: dotnet/customization.yaml
-# - import_playbook: dotnet/vscode.yaml
+- import_playbook: dotnet/customization.yaml
+- import_playbook: dotnet/vscode.yaml
 
 # - import_playbook: git/customization.yaml
 # - import_playbook: git/vscode.yaml
