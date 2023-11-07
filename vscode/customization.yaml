@@ -13,7 +13,7 @@
         state: directory
         mode: 0700
 
-    # macOS-
+    # macOS
     - name: Link '~/Library/Application Support/Code' to '~/.config/Code' (macOS)
       file:
         path: ~/.config/Code

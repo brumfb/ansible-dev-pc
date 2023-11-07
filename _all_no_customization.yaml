@@ -18,8 +18,8 @@
 # Visual Studio Code
 - import_playbook: vscode/core.yaml
 
-# # Docker
-# - import_playbook: docker/core.yaml
+# Docker
+- import_playbook: docker/core.yaml
 
 # # .NET
 # - import_playbook: dotnet/core.yaml
