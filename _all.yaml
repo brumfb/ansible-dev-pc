@@ -31,8 +31,8 @@
 
 - import_playbook: mono/vscode.yaml
 
-# - import_playbook: nodejs/customization.yaml
-# - import_playbook: nodejs/vscode.yaml
+- import_playbook: nodejs/customization.yaml
+- import_playbook: nodejs/vscode.yaml
 
 # - import_playbook: python/vscode.yaml
 
