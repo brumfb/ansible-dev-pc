@@ -36,7 +36,7 @@
 
 # - import_playbook: python/vscode.yaml
 
-# - import_playbook: rust-lang/vscode.yaml
+- import_playbook: rust-lang/vscode.yaml
 
 # ##### Applications (free)
 
