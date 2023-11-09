@@ -24,8 +24,8 @@
 # .NET
 - import_playbook: dotnet/core.yaml
 
-# # git
-# - import_playbook: git/core.yaml
+# git
+- import_playbook: git/core.yaml
 
 # # golang
 # - import_playbook: golang/core.yaml

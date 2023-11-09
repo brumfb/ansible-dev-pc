@@ -24,8 +24,8 @@
 - import_playbook: dotnet/customization.yaml
 - import_playbook: dotnet/vscode.yaml
 
-# - import_playbook: git/customization.yaml
-# - import_playbook: git/vscode.yaml
+- import_playbook: git/customization.yaml
+- import_playbook: git/vscode.yaml
 
 # - import_playbook: golang/vscode.yaml
 

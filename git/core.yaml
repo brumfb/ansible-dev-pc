@@ -4,6 +4,7 @@
 
   vars:
     is_ubuntu_bionic: "{{ ansible_distribution_release == 'bionic' }}"
+    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
     linux_git_packages:
       - git
       - git-gui
@@ -11,12 +12,14 @@
       - gitk
 
   tasks:
+    # Linux
     - name: Add Git APT package key
       become: yes
       get_url:
         url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xa1715d88e1df1f24
         dest: /etc/apt/keyrings/git.asc
         mode: 0644
+      when: not is_mac
 
     - name: Add Git APT package repository
       become: yes
@@ -25,6 +28,7 @@
         filename: git
         update_cache: no
       register: apt_repository
+      when: not is_mac
 
     - name: Update APT package list
       become: yes
@@ -40,6 +44,7 @@
       apt:
         package: "{{ item }}"
       loop: "{{ linux_git_packages }}"
+      when: not is_mac
 
     - name: "[Ubuntu 18.04] Determine latest version"
       shell:
@@ -58,4 +63,17 @@
       become: yes
       apt:
         package: ripgrep
-      when: not is_ubuntu_bionic
+      when: not is_ubuntu_bionic and not is_mac
+
+    # macOS
+    - name: Install Homebrew packages
+      homebrew:
+        name: "{{ item }}"
+      loop:
+        - git
+        - git-gui
+        - git-lfs
+        - gpg
+        - gnu-sed
+        - ripgrep
+      when: is_mac

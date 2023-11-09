@@ -137,7 +137,7 @@
           GIT_PROMPT_SYMBOLS_NO_REMOTE_TRACKING="\`echoColor 25 227\` "
           GIT_PROMPT_SYMBOLS_PREHASH=":"
 
-    - name: Customer .gitconfig
+    - name: Custom .gitconfig
       blockinfile:
         path: ~/.gitconfig
         create: true
