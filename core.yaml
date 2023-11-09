@@ -149,7 +149,7 @@
         upgrade_all: yes
       when: is_mac
 
-    - name: Install core packages
+    - name: Install core packages (macOS)
       homebrew:
         name: "{{ item }}"
       loop:
