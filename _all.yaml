@@ -29,7 +29,7 @@
 
 - import_playbook: golang/vscode.yaml
 
-# - import_playbook: mono/vscode.yaml
+- import_playbook: mono/vscode.yaml
 
 # - import_playbook: nodejs/customization.yaml
 # - import_playbook: nodejs/vscode.yaml

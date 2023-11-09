@@ -7,16 +7,19 @@
       'Pop!_OS': 'Ubuntu'
     distribution_release_fallback:
       'jammy': 'focal'
+    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
 
   tasks:
-    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
+    # Linux
     - name: Add Mono APT package key
       become: yes
       get_url:
         url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3fa7e0328081bff6a14da29aa6a19b38d3d831ef
         dest: /etc/apt/keyrings/mono-official-stable.asc
         mode: 0644
+      when: not is_mac
 
     - name: Add Mono APT package repository
       become: yes
@@ -25,6 +28,7 @@
         filename: mono-official-stable
         update_cache: no
       register: apt_repository
+      when: not is_mac
 
     - name: Update APT package list
       become: yes
@@ -35,7 +39,7 @@
       retries: 5
       until: apt_update is success
 
-    - name: Install Mono
+    - name: Install Mono (Linux)
       become: yes
       apt:
         package: "{{ item }}"
@@ -43,6 +47,7 @@
         - mono-complete
         - mono-vbnc
       register: mono_install
+      when: not is_mac
 
     - name: "[WSL] Disable .NET app auto-run with Mono (now)"
       become: yes
@@ -56,3 +61,9 @@
         block: |
           sudo update-binfmts --disable cli
       when: is_wsl
+
+    # macOS
+    - name: Install Mono (macOS)
+      homebrew:
+        name: mono
+      when: is_mac
