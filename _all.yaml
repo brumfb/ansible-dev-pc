@@ -27,7 +27,7 @@
 - import_playbook: git/customization.yaml
 - import_playbook: git/vscode.yaml
 
-# - import_playbook: golang/vscode.yaml
+- import_playbook: golang/vscode.yaml
 
 # - import_playbook: mono/vscode.yaml
 

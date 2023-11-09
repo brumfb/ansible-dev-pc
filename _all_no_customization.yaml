@@ -27,8 +27,8 @@
 # git
 - import_playbook: git/core.yaml
 
-# # golang
-# - import_playbook: golang/core.yaml
+# golang
+- import_playbook: golang/core.yaml
 
 # # Mono (.NET Framework)
 # # - import_playbook: mono/core.yaml
