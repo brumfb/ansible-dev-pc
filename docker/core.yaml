@@ -55,7 +55,6 @@
       register: apt_update
       retries: 5
       until: apt_update is success
-      when: not is_mac
 
     - name: Install Docker engine (Linux)
       become: yes
