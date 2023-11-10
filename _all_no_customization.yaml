@@ -51,4 +51,4 @@
 # ##### Applications (free)
 
 # # Alacritty (high performance terminal application)
-# - import_playbook: alacritty/core.yaml
+- import_playbook: alacritty/core.yaml

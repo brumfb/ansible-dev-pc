@@ -25,7 +25,7 @@
         - python3
       when: not is_mac and not is_wsl
 
-    - name: "Install Alacritty"
+    - name: "Install Alacritty (Linux)"
       command: ~/.cargo/bin/cargo install alacritty
       args:
         creates: ~/.cargo/bin/alacritty
@@ -70,4 +70,3 @@
       homebrew_cask:
         name: alacritty
       when: is_mac
-      when: not is_wsl

@@ -40,7 +40,7 @@
 
 # ##### Applications (free)
 
-# - import_playbook: alacritty/customization.yaml
+- import_playbook: alacritty/customization.yaml
 
 # ##### This has to be last, because it enables WSL Remote, which breaks installing Code extensions in WSL 2
 
