@@ -39,8 +39,8 @@
 # Postman
 - import_playbook: postman/core.yaml
 
-# # Python
-# - import_playbook: python/core.yaml
+# Python
+- import_playbook: python/core.yaml
 
 # rust-lang
 - import_playbook: rust-lang/core.yaml
