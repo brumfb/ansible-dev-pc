@@ -32,8 +32,10 @@
           font:
             normal:
               family: JetBrainsMono Nerd Font Mono
-            size: 10.0
+            size: 12.0
+            {% if not is_mac %}
             use_thin_strokes: true
+            {% endif %}
 
           draw_bold_text_with_bright_colors: true
 
@@ -90,3 +92,13 @@
           key_bindings:
             - { key: T, mods: Control|Shift, action: SpawnNewInstance }
       when: not is_wsl
+
+    # macOS
+    - name: Set Alacritty 'thin lines' (macOS)
+      community.general.osx_defaults:
+        domain: org.alacritty
+        key: AppleFontSmoothing
+        type: int
+        value: 0
+        state: present
+      when: is_mac
