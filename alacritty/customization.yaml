@@ -95,10 +95,7 @@
 
     # macOS
     - name: Set Alacritty 'thin lines' (macOS)
-      community.general.osx_defaults:
-        domain: org.alacritty
-        key: AppleFontSmoothing
-        type: int
-        value: 0
-        state: present
+      ## Note: we use shell vs osx_defaults so we can run this file on non-mac machiens
+      shell:
+        cmd: defaults write org.alacritty AppleFontSmoothing -int 0
       when: is_mac
