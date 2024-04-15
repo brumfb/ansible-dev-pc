@@ -45,6 +45,9 @@
 # rust-lang
 - import_playbook: rust-lang/core.yaml
 
+# java
+- import_playbook: java/core.yaml
+
 # neovim
 - import_playbook: neovim/core.yaml
 
