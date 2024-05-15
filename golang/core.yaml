@@ -44,7 +44,7 @@
     - name: Install Go (macOS)
       homebrew:
         name: go
-      register: go_d  ownload_mac
+      register: go_download_mac
       when: is_mac
 
     # Common
