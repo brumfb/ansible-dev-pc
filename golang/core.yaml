@@ -3,7 +3,7 @@
   connection: local
 
   vars:
-    go_version: 1.21.4
+    go_version: 1.22.3
     is_mac: "{{ ansible_distribution == 'MacOSX' }}"
 
   tasks:
@@ -44,7 +44,7 @@
     - name: Install Go (macOS)
       homebrew:
         name: go
-      register: go_download_mac
+      register: go_d  ownload_mac
       when: is_mac
 
     # Common
