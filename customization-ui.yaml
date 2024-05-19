@@ -55,6 +55,12 @@
         value: "@u 25"
       - key: /org/gnome/desktop/peripherals/mouse/accel-profile
         value: "'adaptive'"
+      - key: /org/gnome/desktop/peripherals/mouse/natural-scroll
+        value: "false"
+      - key: /org/gnome/desktop/peripherals/touchpad/natural-scroll
+        value: "true"
+      - key: /org/gnome/desktop/peripherals/touchpad/two-finger-scrolling-enabled
+        value: "true"
       # Keyboard shortcuts
       # - key: /org/gnome/desktop/wm/keybindings/activate-window-menu
       #   value: "['<Alt>space']"
