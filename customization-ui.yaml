@@ -3,9 +3,16 @@
   connection: local
 
   vars:
+  
+    distribution_fallback:
+      'Pop!_OS': 'Ubuntu'
+    distribution: "{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) }}"
     distribution_release_snwh_fallback:
+      'noble': 'focal'
       'jammy': 'focal'
     distribution_release_snwh: "{{ distribution_release_snwh_fallback[ansible_distribution_release] | default(ansible_distribution_release) }}"
+    is_ubu_22_04: "{{ distribution == 'Ubuntu' and (ansible_distribution_major_version | int) == 22 }}"
+    is_ubu_24_04: "{{ distribution == 'Ubuntu' and (ansible_distribution_major_version | int) == 24 }}"
 
     dconf_config:
       # Themes
@@ -29,10 +36,10 @@
         value: "true"
       - key: /org/gnome/desktop/wm/preferences/button-layout
         value: "'appmenu:minimize,maximize,close'"
-      - key: /org/gnome/desktop/wm/preferences/num-workspaces
-        value: "1"
-      - key: /org/gnome/mutter/dynamic-workspaces
-        value: "false"
+      # - key: /org/gnome/desktop/wm/preferences/num-workspaces
+      #   value: "1"
+      # - key: /org/gnome/mutter/dynamic-workspaces
+      #   value: "false"
       - key: /org/gnome/settings-daemon/plugins/xsettings/antialiasing
         value: "'grayscale'"
       - key: /org/gnome/shell/favorite-apps
@@ -49,212 +56,212 @@
       - key: /org/gnome/desktop/peripherals/mouse/accel-profile
         value: "'adaptive'"
       # Keyboard shortcuts
-      - key: /org/gnome/desktop/wm/keybindings/activate-window-menu
-        value: "['<Alt>space']"
-      - key: /org/gnome/desktop/wm/keybindings/always-on-top
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/begin-move
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/begin-resize
-        value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/activate-window-menu
+      #   value: "['<Alt>space']"
+      # - key: /org/gnome/desktop/wm/keybindings/always-on-top
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/begin-move
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/begin-resize
+      #   value: "@as []"
       - key: /org/gnome/desktop/wm/keybindings/close
         value: "['<Alt>F4']"
-      - key: /org/gnome/desktop/wm/keybindings/cycle-group
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/cycle-group-backward
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/cycle-panels
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/cycle-panels-backward
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/cycle-windows
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/cycle-windows-backward
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/lower
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/maximize-horizontally
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/maximize
-        value: "['<Super>Up']"
-      - key: /org/gnome/desktop/wm/keybindings/maximize-vertically
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/minimize
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-center
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-corner-ne
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-corner-nw
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-corner-se
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-corner-sw
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-monitor-down
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-monitor-left
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-monitor-right
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-monitor-up
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-side-e
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-side-n
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-side-s
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-side-w
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-10
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-11
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-12
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-1
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-2
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-3
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-4
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-5
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-6
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-7
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-8
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-9
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-down
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-last
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-left
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-right
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-up
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/panel-main-menu
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/panel-run-dialog
-        value: "['<Super>r']"
-      - key: /org/gnome/desktop/wm/keybindings/raise
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/raise-or-lower
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/set-spew-mark
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/show-desktop
-        value: "['<Super>m']"
-      - key: /org/gnome/desktop/wm/keybindings/switch-applications
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-applications-backward
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-group
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-group-backward
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-input-source
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-input-source-backward
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-panels
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-panels-backward
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-10
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-11
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-12
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-1
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-2
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-3
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-4
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-5
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-6
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-7
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-8
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-9
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-down
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-last
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-left
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-right
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-up
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/switch-windows
-        value: "['<Alt>Tab']"
-      - key: /org/gnome/desktop/wm/keybindings/switch-windows-backward
-        value: "['<Shift><Alt>Tab']"
-      - key: /org/gnome/desktop/wm/keybindings/toggle-above
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/toggle-fullscreen
-        value: "['<Super>f']"
-      - key: /org/gnome/desktop/wm/keybindings/toggle-maximized
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/toggle-on-all-workspaces
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/toggle-shaded
-        value: "@as []"
-      - key: /org/gnome/desktop/wm/keybindings/unmaximize
-        value: "['<Super>Down']"
-      - key: /org/gnome/mutter/keybindings/toggle-tiled-left
-        value: "['<Super>Left']"
-      - key: /org/gnome/mutter/keybindings/toggle-tiled-right
-        value: "['<Super>Right']"
-      - key: /org/gnome/settings-daemon/plugins/media-keys/home
-        value: "'<Super>e'"
+      # - key: /org/gnome/desktop/wm/keybindings/cycle-group
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/cycle-group-backward
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/cycle-panels
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/cycle-panels-backward
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/cycle-windows
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/cycle-windows-backward
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/lower
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/maximize-horizontally
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/maximize
+      #   value: "['<Super>Up']"
+      # - key: /org/gnome/desktop/wm/keybindings/maximize-vertically
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/minimize
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-center
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-corner-ne
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-corner-nw
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-corner-se
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-corner-sw
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-monitor-down
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-monitor-left
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-monitor-right
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-monitor-up
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-side-e
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-side-n
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-side-s
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-side-w
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-10
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-11
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-12
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-1
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-2
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-3
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-4
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-5
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-6
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-7
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-8
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-9
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-down
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-last
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-left
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-right
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/move-to-workspace-up
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/panel-main-menu
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/panel-run-dialog
+      #   value: "['<Super>r']"
+      # - key: /org/gnome/desktop/wm/keybindings/raise
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/raise-or-lower  
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/set-spew-mark
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/show-desktop
+      #   value: "['<Super>m']"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-applications
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-applications-backward
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-group
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-group-backward
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-input-source
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-input-source-backward
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-panels
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-panels-backward
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-10
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-11
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-12
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-1
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-2
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-3
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-4
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-5
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-6
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-7
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-8
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-9
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-down
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-last
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-left
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-right
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-to-workspace-up
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-windows
+      #   value: "['<Alt>Tab']"
+      # - key: /org/gnome/desktop/wm/keybindings/switch-windows-backward
+      #   value: "['<Shift><Alt>Tab']"
+      # - key: /org/gnome/desktop/wm/keybindings/toggle-above
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/toggle-fullscreen
+      #   value: "['<Super>f']"
+      # - key: /org/gnome/desktop/wm/keybindings/toggle-maximized
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/toggle-on-all-workspaces
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/toggle-shaded
+      #   value: "@as []"
+      # - key: /org/gnome/desktop/wm/keybindings/unmaximize
+      #   value: "['<Super>Down']"
+      # - key: /org/gnome/mutter/keybindings/toggle-tiled-left
+      #   value: "['<Super>Left']"
+      # - key: /org/gnome/mutter/keybindings/toggle-tiled-right
+      #   value: "['<Super>Right']"
+      # - key: /org/gnome/settings-daemon/plugins/media-keys/home
+      #   value: "'<Super>e'"
       - key: /org/gnome/settings/daemon/plugins/media-keys/screensaver
         value: "['<Super>l']"
       - key: /org/gnome/shell/extensions/emoji-selector/emoji-keybinding
         value: "['<Super>Period']"
       - key: /org/gnome/shell/extensions/emoji-selector/use-keybinding
         value: "true"
-      - key: /org/gnome/shell/keybindings/open-application-menu
-        value: "@as []"
-      - key: /org/gnome/shell/keybindings/toggle-message-tray
-        value: "@as []"
+      # - key: /org/gnome/shell/keybindings/open-application-menu
+      #   value: "@as []"
+      # - key: /org/gnome/shell/keybindings/toggle-message-tray
+      #   value: "@as []"
 
     fonts:
       # FiraCode Nerd Font
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Regular/FiraCodeNerdFontMono-Regular.ttf
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Bold/FiraCodeNerdFontMono-Bold.ttf
       # Iosevka
-      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/Regular/IosevkaNerdFontMono-Regular.ttf
-      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/Italic/IosevkaNerdFontMono-Italic.ttf
-      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/Bold-Italic/IosevkaNerdFontMono-BoldItalic.ttf
-      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/Bold/IosevkaNerdFontMono-Bold.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/IosevkaNerdFontMono-Regular.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/IosevkaNerdFontMono-Italic.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/IosevkaNerdFontMono-Bold.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Iosevka/IosevkaNerdFontMono-BoldItalic.ttf
       # JetBrainsMono Nerd Font
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/JetBrainsMono/Ligatures/Regular/JetBrainsMonoNerdFontMono-Regular.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/JetBrainsMono/Ligatures/Italic/JetBrainsMonoNerdFontMono-Italic.ttf
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/JetBrainsMono/Ligatures/Bold/JetBrainsMonoNerdFontMono-Bold.ttf
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/JetBrainsMono/Ligatures/BoldItalic/JetBrainsMonoNerdFontMono-BoldItalic.ttf
-      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/JetBrainsMono/Ligatures/Italic/JetBrainsMonoNerdFontMono-Italic.ttf
       # UbuntuMono Nerd Font
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Regular/UbuntuMonoNerdFontMono-Regular.ttf
+      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Regular-Italic/UbuntuMonoNerdFontMono-Italic.ttf
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Bold/UbuntuMonoNerdFontMono-Bold.ttf
       - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Bold-Italic/UbuntuMonoNerdFontMono-BoldItalic.ttf
-      - https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Regular-Italic/UbuntuMonoNerdFontMono-Italic.ttf
 
     fonts_apt:
       - fonts-crosextra-carlito
@@ -382,7 +389,7 @@
     - name: "Add paper Gnome icon theme APT package source"
       become: yes
       apt_repository:
-        repo: deb [signed-by=/etc/apt/keyrings/ppa_snwh_ppa_{{ distribution_release_snwh }}.asc] http://ppa.launchpad.net/snwh/ppa/ubuntu {{ distribution_release_snwh }} main
+        repo: deb http://ppa.launchpad.net/snwh/ppa/ubuntu {{ distribution_release_snwh }} main
         filename: ppa_snwh_ppa_{{ distribution_release_snwh }}
         update_cache: no
       register: apt_repository
