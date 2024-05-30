@@ -8,8 +8,6 @@
     is_mac: "{{ ansible_distribution == 'MacOSX' }}"
     is_ubuntu: "{{ ansible_distribution == 'Ubuntu' or ansible_distribution == 'Pop!_OS' }}"
     machine_arch: "{{ 'Darwin-x86_64' if is_mac else 'Linux-x86_64' }}"
-    nvidia_distribution_version_fallback:
-      '21.10': '20.04'
 
   tasks:
     - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
