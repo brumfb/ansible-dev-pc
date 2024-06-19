@@ -154,6 +154,8 @@
         name: "{{ item }}"
       loop:
         - gnu-tar
+        - fortune
+        - neofetch
       when: is_mac
 
     - name: Add GNU tar to the PATH
