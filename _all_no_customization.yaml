@@ -55,3 +55,6 @@
 
 # # Alacritty (high performance terminal application)
 - import_playbook: alacritty/core.yaml
+
+# Slack desktop application
+- import_playbook: slack/core.yaml
