@@ -19,12 +19,12 @@
 
     dconf_config:
       # Themes
-      - key: /org/gnome/desktop/interface/cursor-theme
-        value: "'Paper'"
+      # - key: /org/gnome/desktop/interface/cursor-theme
+      #   value: "'Paper'"
       - key: /org/gnome/desktop/interface/gtk-theme
         value: "'Numix'"
-      - key: /org/gnome/desktop/interface/icon-theme
-        value: "'Paper'"
+      # - key: /org/gnome/desktop/interface/icon-theme
+      #   value: "'Paper'"
       - key: /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/use-theme-colors
         value: "false"
       # Fonts
@@ -409,13 +409,14 @@
       command: fc-cache -sv
       when: not is_mac and not is_wsl and fonts_downloaded.changed
 
-    - name: "Add Gnome themes APT package key"
-      become: yes
-      get_url:
-        url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xd320d0c30b02e64c5b2bb2743766223989993a70
-        dest: /etc/apt/keyrings/ppa_snwh_ppa_{{ distribution_release_snwh }}.asc
-        mode: 0644
-      when: not is_mac and not is_wsl
+    # Removed until solving the downloaded key issue
+    # - name: "Add Gnome themes APT package key"
+    #   become: yes
+    #   get_url:
+    #     url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xd320d0c30b02e64c5b2bb2743766223989993a70
+    #     dest: /etc/apt/keyrings/ppa_snwh_ppa_{{ distribution_release_snwh }}.asc
+    #     mode: 0644
+    #   when: not is_mac and not is_wsl
 
     - name: "Install Gnome Tweaks"
       become: yes
@@ -435,31 +436,32 @@
         package: numix-gtk-theme
       when: not is_mac and not is_wsl
 
-    - name: "Add paper Gnome icon theme APT package source"
-      become: yes
-      apt_repository:
-        repo: deb http://ppa.launchpad.net/snwh/ppa/ubuntu {{ distribution_release_snwh }} main
-        filename: ppa_snwh_ppa_{{ distribution_release_snwh }}
-        update_cache: no
-      register: apt_repository
-      when: not is_mac and not is_wsl
+    # Downloaded key does not appear to match repository
+    # - name: "Add paper Gnome icon theme APT package source"
+    #   become: yes
+    #   apt_repository:
+    #     repo: deb http://ppa.launchpad.net/snwh/ppa/ubuntu {{ distribution_release_snwh }} main
+    #     filename: ppa_snwh_ppa_{{ distribution_release_snwh }}
+    #     update_cache: no
+    #   register: apt_repository
+    #   when: not is_mac and not is_wsl
 
-    - name: "Update APT package list"
-      become: yes
-      apt:
-        update_cache: yes
-      when: is_ubuntu and not is_wsl and apt_repository.changed
-      register: apt_update
-      retries: 5
-      until: apt_update is success
+    # - name: "Update APT package list"
+    #   become: yes
+    #   apt:
+    #     update_cache: yes
+    #   when: is_ubuntu and not is_wsl and apt_repository.changed
+    #   register: apt_update
+    #   retries: 5
+    #   until: apt_update is success
 
-    - name: "Install paper Gnome icon theme"
-      become: yes
-      apt:
-        package: "{{ item }}"
-      loop:
-        - paper-icon-theme
-      when: is_ubuntu and not is_wsl
+    # - name: "Install paper Gnome icon theme"
+    #   become: yes
+    #   apt:
+    #     package: "{{ item }}"
+    #   loop:
+    #     - paper-icon-theme
+    #   when: is_ubuntu and not is_wsl
 
     - name: "Install PIP 3"
       become: yes
