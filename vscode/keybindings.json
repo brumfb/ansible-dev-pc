@@ -45,10 +45,6 @@
     "command": "workbench.action.quickOpen"
   },
   {
-    "key": "ctrl+b",
-    "command": "workbench.action.tasks.runTask"
-  },
-  {
     "key": "ctrl+-",
     "command": "-workbench.action.zoomOut"
   },
