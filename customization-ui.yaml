@@ -3,7 +3,7 @@
   connection: local
 
   vars:
-  
+
     distribution_fallback:
       'Pop!_OS': 'Ubuntu'
     distribution: "{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) }}"
@@ -163,7 +163,7 @@
       #   value: "['<Super>r']"
       # - key: /org/gnome/desktop/wm/keybindings/raise
       #   value: "@as []"
-      # - key: /org/gnome/desktop/wm/keybindings/raise-or-lower  
+      # - key: /org/gnome/desktop/wm/keybindings/raise-or-lower
       #   value: "@as []"
       # - key: /org/gnome/desktop/wm/keybindings/set-spew-mark
       #   value: "@as []"
@@ -362,7 +362,7 @@
         missing_extensions: "{{ missing_extensions + [item.item] }}"
       when: not is_wsl and is_ubu_24_04 and not item.stat.exists
       with_items: "{{ gnome_extensions_v46_installed.results }}"
-    
+
     - name: "[Non-WSL] Download Gnome extensions"
       get_url:
         url: https://extensions.gnome.org/extension-data/{{ item.file }}
@@ -374,6 +374,10 @@
     - name: "[Non-WSL] Install Gnome extension"
       command: gnome-extensions install /tmp/gnome-extensions/{{ item.file }}
       loop: "{{ missing_extensions }}"
+      when: not is_wsl and not is_mac
+
+    - name: "[Non-WSL] Disable Cosmic Dock"
+      command: gnome-extensions disable cosmic-dock@system76.com
       when: not is_wsl and not is_mac
 
     # Not working...
