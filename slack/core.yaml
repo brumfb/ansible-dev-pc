@@ -3,10 +3,10 @@
   connection: local
 
   vars:
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
 
   tasks:
-    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
   # Linux
     - name: "[Non-WSL] Add Slack APT package key"
@@ -15,7 +15,7 @@
         url: https://packagecloud.io/slacktechnologies/slack/gpgkey
         dest: /etc/apt/trusted.gpg.d/slack.asc
         mode: 0644
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     - name: "[Non-WSL] Add Slack APT package repository"
       become: yes
@@ -24,7 +24,7 @@
         filename: slack
         update_cache: no
       register: apt_repository
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     - name: "[Non-WSL] Update APT package list"
       become: yes
@@ -39,4 +39,4 @@
       become: yes
       apt:
         package: slack-desktop
-      when: not is_mac and not is_wsl
+      when:  not is_wsl

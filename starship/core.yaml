@@ -4,10 +4,10 @@
 
   vars:
     starship_version: v1.18.2
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
 
   tasks:
-    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
   # Common
     - name: Create binary folder
@@ -24,7 +24,7 @@
         dest: /opt/starship/{{ starship_version }}
         remote_src: yes
         creates: /opt/starship/{{ starship_version }}/starship
-      when: not is_mac
+
 
     - name: Set Starship binary ownership to root
       become: yes
@@ -32,17 +32,6 @@
         path: /opt/starship/{{ starship_version }}/starship
         owner: root
         group: root
-      when: not is_mac
-
-  # MacOS
-    - name: Install Starship (macOS)
-      become: yes
-      unarchive:
-        src: https://github.com/starship/starship/releases/download/{{ starship_version }}/starship-aarch64-apple-darwin.tar.gz
-        dest: /opt/starship/{{ starship_version }}
-        remote_src: yes
-        creates: /opt/starship/{{ starship_version }}/starship
-      when: is_mac
 
   # Common
     - name: Create symlink to /usr/local/bin/starship

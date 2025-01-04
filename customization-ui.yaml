@@ -14,7 +14,7 @@
     is_ubu_22_04: "{{ distribution == 'Ubuntu' and (ansible_distribution_major_version | int) == 22 }}"
     is_ubu_24_04: "{{ distribution == 'Ubuntu' and (ansible_distribution_major_version | int) == 24 }}"
 
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
     is_ubuntu: "{{ ansible_distribution == 'Ubuntu' or ansible_distribution == 'Pop!_OS' }}"
 
     dconf_config:
@@ -303,7 +303,7 @@
     missing_extensions: []
 
   tasks:
-    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
     - name: "[WSL] Get Windows folder"
       shell: wslpath "$(cmd.exe /c "echo %WINDIR%" 2>/dev/null)"
@@ -335,7 +335,7 @@
         path: /tmp/gnome-extensions
         state: directory
         mode: 0755
-      when: not is_wsl and not is_mac
+      when: not is_wsl
 
     - name: "[Non-WSL, Gnome v42] Check if extension is installed"
       stat:
@@ -369,35 +369,35 @@
         dest: /tmp/gnome-extensions
         mode: 0644
       loop: "{{ missing_extensions }}"
-      when: not is_wsl and not is_mac
+      when: not is_wsl
 
     - name: "[Non-WSL] Install Gnome extension"
       command: gnome-extensions install /tmp/gnome-extensions/{{ item.file }}
       loop: "{{ missing_extensions }}"
-      when: not is_wsl and not is_mac
+      when: not is_wsl
 
     - name: "[Non-WSL] Disable Cosmic Dock"
       command: gnome-extensions disable cosmic-dock@system76.com
-      when: not is_wsl and not is_mac
+      when: not is_wsl
 
     # Not working...
     # - name: "[Non-WSL] Enable Gnome extension"
     #   command: gnome-extensions enable {{ item.name }}
     #   loop: "{{ missing_extensions }}"
-    #   when: not is_wsl and not is_mac
+    #   when: not is_wsl
 
     - name: "Install Fonts (via APT)"
       become: yes
       apt:
         package: "{{ item }}"
       loop: "{{ fonts_apt }}"
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     - name: "Install Microsoft TTF fonts"
       become: yes
       apt:
         package: ttf-mscorefonts-installer
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     - name: "Install Fonts (downloaded)"
       become: yes
@@ -406,12 +406,12 @@
         dest: /usr/local/share/fonts/
       loop: "{{ fonts }}"
       register: fonts_downloaded
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     - name: "[Update font cache"
       become: yes
       command: fc-cache -sv
-      when: not is_mac and not is_wsl and fonts_downloaded.changed
+      when:  not is_wsl and fonts_downloaded.changed
 
     # Removed until solving the downloaded key issue
     # - name: "Add Gnome themes APT package key"
@@ -420,25 +420,25 @@
     #     url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xd320d0c30b02e64c5b2bb2743766223989993a70
     #     dest: /etc/apt/keyrings/ppa_snwh_ppa_{{ distribution_release_snwh }}.asc
     #     mode: 0644
-    #   when: not is_mac and not is_wsl
+    #   when:  not is_wsl
 
     - name: "Install Gnome Tweaks"
       become: yes
       apt:
         package: gnome-tweaks
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     - name: "Enable chrome-gnome-shell"
       become: yes
       apt:
         package: chrome-gnome-shell
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     - name: "Install numix Gnome theme"
       become: yes
       apt:
         package: numix-gtk-theme
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     # Downloaded key does not appear to match repository
     # - name: "Add paper Gnome icon theme APT package source"
@@ -448,7 +448,7 @@
     #     filename: ppa_snwh_ppa_{{ distribution_release_snwh }}
     #     update_cache: no
     #   register: apt_repository
-    #   when: not is_mac and not is_wsl
+    #   when:  not is_wsl
 
     # - name: "Update APT package list"
     #   become: yes
@@ -471,25 +471,17 @@
       become: yes
       apt:
         package: python3-pip
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     - name: "Install psutil Python package"
       become: yes
       pip:
         name: psutil
-      when: not is_mac and not is_wsl
+      when:  not is_wsl
 
     - name: "Update customization with dconf"
       dconf:
         key: "{{ item.key }}"
         value: "{{ item.value }}"
       loop: "{{ dconf_config }}"
-      when: not is_mac and not is_wsl
-
-  # macOS
-    - name: Install Fonts (macOS)
-      get_url:
-        url: "{{ item }}"
-        dest: ~/Library/Fonts/
-      loop: "{{ fonts }}"
-      when: is_mac
+      when:  not is_wsl

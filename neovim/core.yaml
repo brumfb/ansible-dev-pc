@@ -4,7 +4,7 @@
 
   vars:
     neovim_version: "0.8.1"
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
 
   tasks:
     - name: Creating neovim folder

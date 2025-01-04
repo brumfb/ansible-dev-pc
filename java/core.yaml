@@ -9,10 +9,10 @@
       'Pop!_OS': 'Ubuntu'
     distribution_release_fallback:
       'jammy': 'focal'
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
 
   tasks:
-    - set_fact: is_wsl={{ not is_mac and lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
 
     # Linux
     - name: Add linuxuprising APT package key
@@ -21,7 +21,7 @@
         url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x1CC3D16E460A94EE17FE581CEA8CACC073C3DB2A
         dest: /etc/apt/keyrings/linuxuprising-java.asc
         mode: 0644
-      when: not is_mac
+
 
     - name: Add Oracle Java
       become: yes
@@ -30,7 +30,7 @@
         filename: oracle-linuxuprising-java
         update_cache: no
       register: apt_repository
-      when: not is_mac
+
 
     - name: Accept Oracle Java license
       become: yes
@@ -39,7 +39,7 @@
         question: 'shared/accepted-oracle-license-v1-3'
         value: 'true'
         vtype: 'select'
-      when: not is_mac
+
 
     - name: Update APT package list
       become: yes
@@ -56,7 +56,7 @@
         name: 'oracle-java{{ java_version }}-installer'
         state: present
         install_recommends: false
-      when: not is_mac
+
 
 
 

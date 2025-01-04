@@ -3,7 +3,7 @@
   connection: local
 
   vars:
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
 
   tasks:
     # Linux
@@ -16,7 +16,7 @@
         - curl
         - gcc
         - make
-      when: not is_mac
+
 
     # Common
     - name: Install Rust

@@ -3,7 +3,7 @@
   connection: local
 
   vars:
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
 
   tasks:
     # Common
@@ -33,7 +33,7 @@
       file:
         path: /etc/docker
         state: directory
-      when: not is_mac
+
 
     - name: Configure default Docker network (Linux)
       become: yes
@@ -46,23 +46,3 @@
             ],
             "experimental": true
           }
-      when: not is_mac
-
-    # macOS
-    - name: Ensure configuration folder exists (macOS)
-      file:
-        path: ~/.docker
-        state: directory
-      when: is_mac
-
-    - name: Configure default Docker network (macOS)
-      copy:
-        dest: ~/.docker/daemon.json
-        content: |
-          {
-            "default-address-pools": [
-              { "base": "192.168.240.0/20", "size": 24 }
-            ],
-            "experimental": true
-          }
-      when: is_mac

@@ -3,7 +3,7 @@
   connection: local
 
   vars:
-    is_mac: "{{ ansible_distribution == 'MacOSX' }}"
+
 
   tasks:
     # Common
@@ -12,14 +12,6 @@
         path: ~/.config
         state: directory
         mode: 0700
-
-    # macOS
-    - name: Link '~/Library/Application Support/Code' to '~/.config/Code' (macOS)
-      file:
-        path: ~/.config/Code
-        src: ~/Library/Application Support/Code
-        state: link
-      when: is_mac
 
     # Linux
     - name: Install VS Live Share dependencies
@@ -32,7 +24,7 @@
         - libsecret-1-0
         - desktop-file-utils
         - x11-utils
-      when: not is_mac
+
 
     - name: Install VS Code extensions
       command: ./invoke-code --install-extension {{ item }}
