@@ -1,0 +1,18 @@
+- name: Ghostty
+  hosts: 127.0.0.1
+  connection: local
+
+  vars:
+    distribution_fallback:
+      'Pop!_OS': 'Ubuntu'
+    distribution: "{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) }}"
+    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' }}"
+
+  tasks:
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+
+    - name: "Get Ghostty package"
+      become: yes
+      apt:
+        deb: "https://github.com/mkasberg/ghostty-ubuntu/releases/download/1.0.1-0-ppa1/ghostty_1.0.1-0.ppa1_amd64_{{ ansible_distribution_version }}.deb"
+      when: is_ubuntu
