@@ -51,10 +51,16 @@
 # neovim
 - import_playbook: neovim/core.yaml
 
+##### Cloud tools
+- import_playbook: gcloud/core.yaml
+
 # ##### Applications (free)
 
 # # Alacritty (high performance terminal application)
 - import_playbook: alacritty/core.yaml
+
+# Ghostty
+- import_playbook: ghostty/core.yaml
 
 # Slack desktop application
 - import_playbook: slack/core.yaml
