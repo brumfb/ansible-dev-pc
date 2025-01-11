@@ -1,0 +1,39 @@
+- name: gcloud
+  hosts: 127.0.0.1
+  connection: local
+
+  vars:
+    linux_glcoud_packages: # Add other packaages here for other options https://cloud.google.com/sdk/docs/install#deb
+      - google-cloud-cli
+
+
+  tasks:
+    - name: Add GCloud APT package key
+      become: yes
+      get_url:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        dest: /etc/apt/keyrings/gcloud.asc
+        mode: 0644
+
+    - name: Add GCloud APT package repository
+      become: yes
+      apt_repository:
+        repo: deb [signed-by=/etc/apt/keyrings/gcloud.asc] https://packages.cloud.google.com/apt cloud-sdk main
+        filename: gcloud
+        update_cache: no
+      register: apt_repository
+
+    - name: Update APT package list
+      become: yes
+      apt:
+        update_cache: yes
+      when: apt_repository.changed
+      register: apt_update
+      retries: 5
+      until: apt_update is success
+
+    - name: Install APT package
+      become: yes
+      apt:
+        package: "{{ item }}"
+      loop: "{{ linux_glcoud_packages }}"
