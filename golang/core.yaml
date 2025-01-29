@@ -3,7 +3,7 @@
   connection: local
 
   vars:
-    go_version: 1.23.0
+    go_version: 1.23.5
 
 
   tasks:
