@@ -8,7 +8,7 @@
     distribution_fallback:
       'Pop!_OS': 'Ubuntu'
     distribution_release_fallback:
-      'jammy': 'focal'
+      'jammy': 'jammy'
 
 
   tasks:
