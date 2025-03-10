@@ -1,0 +1,41 @@
+- name: Vivaldi Browser
+  hosts: 127.0.0.1
+  connection: local
+
+  vars:
+
+
+  tasks:
+    - set_fact: is_wsl={{ lookup('file', '/proc/version') is regex('(M|m)icrosoft') }}
+
+    - name: "Add Vivaldi APT package key"
+      become: yes
+      get_url:
+        url: http://repo.vivaldi.com/stable/linux_signing_key.pub
+        dest: /etc/apt/keyrings/vivaldi.pub
+        mode: 0644
+      when: not is_wsl
+
+    - name: "Add Vivaldi repository"
+      become: yes
+      apt_repository:
+        repo: deb [arch=amd64, signed-by=/etc/apt/keyrings/vivaldi.pub] https://repo.vivaldi.com/stable/deb/ stable main
+        filename: vivaldi
+        update_cache: no
+      register: apt_repository
+      when: not is_wsl
+
+    - name: "Update APT package list"
+      become: yes
+      apt:
+        update_cache: yes
+      when: apt_repository.changed
+      register: apt_update
+      retries: 5
+      until: apt_update is success
+
+    - name: "Install Vivaldi (Linux)"
+      become: yes
+      apt:
+        package: vivaldi-stable
+      when: not is_wsl
