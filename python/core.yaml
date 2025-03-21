@@ -2,6 +2,24 @@
   hosts: 127.0.0.1
   connection: local
 
+  vars:
+    python_dep_packages:
+      - make
+      - build-essential
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - wget
+      - curl
+      - llvm
+      - libncurses5-dev
+      - libncursesw5-dev
+      - xz-utils
+      - tk-dev
+      - liblzma-dev
+
   tasks:
     - name: Install pyenv
       git:
@@ -22,3 +40,11 @@
           export PATH=$PATH:$PYENV_ROOT/bin:$PYENV_ROOT/plugins/pyenv-virtualenv/bin
           eval "$(pyenv init --path)"
           eval "$(pyenv virtualenv-init -)"
+
+    - name: Install Python dependeant APT package
+      become: yes
+      apt:
+        package: "{{ item }}"
+      loop: "{{ python_dep_packages }}"
+      when:
+
