@@ -91,6 +91,15 @@
           unset env
       when: is_wsl
 
+    - name: TAB terminate isearch (WSL)
+      # https://github.com/microsoft/terminal/issues/14695#issuecomment-2707053072
+      blockinfile:
+        path: ~/.inputrc
+        marker: "### {mark} Ansible managed: isearch termination on tab"
+        block: |
+          set isearch-terminators "\C-[\C-J\t"
+      when: is_wsl
+
   # Common
 
     - name: Ensure neofetch configuration folder exists
