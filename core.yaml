@@ -71,6 +71,7 @@
         - unzip
         - uuid
         - xclip
+        - tmux
 
     - name: "[Ubuntu pre-22.04] Install exfat-utils"
       become: yes

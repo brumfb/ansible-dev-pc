@@ -292,3 +292,11 @@
               *)   ;;
             esac
           fi
+    
+    - name: Add tmux.conf
+      blockinfile:
+        path: ~/.tmux.conf
+        marker: "### {mark} Ansible managed: tmux conf"
+        block: |
+          set -g mouse on
+
