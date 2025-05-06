@@ -42,6 +42,8 @@
 
 - import_playbook: rust-lang/vscode.yaml
 
+- import_playbook: neovim/customization.yaml
+
 # ##### Applications (free)
 
 - import_playbook: alacritty/customization.yaml

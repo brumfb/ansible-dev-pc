@@ -1,0 +1,12 @@
+- name: neovim (customization)
+  hosts: 127.0.0.1
+  connection: local
+
+  tasks:
+    - name: Set vim as default EDITOR 
+      blockinfile:
+        path: ~/.bashrc
+        marker: "### {mark} Ansible managed: vim as editor"
+        block: |
+          export VISUAL=vim
+          export EDITOR=${VISUAL}
