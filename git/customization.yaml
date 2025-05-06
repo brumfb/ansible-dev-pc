@@ -59,6 +59,11 @@
             wip = !git add -u && git commit -m "WIP"
             wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
 
+            # Difftastic aliases, so `git dlog` is `git log` with difftastic and so on.
+            dlog = -c diff.external=difft log --ext-diff
+            dshow = -c diff.external=difft show --ext-diff
+            ddiff = -c diff.external=difft diff
+
     - name: Ensure ~/.config exists
       file:
         path: ~/.config
