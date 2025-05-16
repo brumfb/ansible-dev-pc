@@ -299,4 +299,5 @@
         marker: "### {mark} Ansible managed: tmux conf"
         block: |
           set -g mouse on
+        create: true
 
