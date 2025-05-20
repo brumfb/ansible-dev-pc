@@ -286,7 +286,9 @@
           fi
 
           # Start in the ~/dev folder when it exists (and we're in an interactive shell)
-          if [ -d ~/dev ]; then
+          # hack: We don't change directory if we are running as a VSCode terminal window as
+          # detected by the VSCODE_* environment variable
+          if [ -z "VSCODE_IPC_HOOK_CLI" ] && [ -d ~/dev ]; then
             case "$-" in
               *i*) cd ~/dev ;;
               *)   ;;
