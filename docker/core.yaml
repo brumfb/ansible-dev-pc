@@ -14,11 +14,14 @@
 
     # Linux
     - name: Determine Docker Compose latest version
-      shell:
-        cmd: "curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -i \"browser_download_url.*linux-x86_64\\\"\" | cut -d : -f 2,3 | tr -d \\\""
-        warn: false
+      shell: >
+        curl -s https://api.github.com/repos/docker/compose/releases/latest |
+        grep -i 'browser_download_url.*linux-x86_64"' |
+        cut -d : -f 2,3 |
+        tr -d '"'
       register: docker_compose_version
-
+      args:
+        warn: false
 
     - name: Install Docker Compose (Linux)
       become: yes
@@ -72,8 +75,11 @@
 
     # Common
     - name: Determine Docker Machine latest version
-      shell:
-        cmd: "curl -s https://api.github.com/repos/docker/machine/releases/latest | grep \"browser_download_url.*Linux-x86_64\\\"\" | cut -d : -f 2,3 | tr -d \\\""
+      shell: >
+        curl -s -L https://api.github.com/repos/docker/machine/releases/latest | 
+        grep 'browser_download_url.*Linux-x86_64"' | 
+        cut -d : -f 2,3 | 
+        tr -d '"'
       register: docker_machine_version
 
     - name: Install Docker Machine
