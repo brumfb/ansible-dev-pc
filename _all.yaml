@@ -44,6 +44,8 @@
 
 - import_playbook: neovim/customization.yaml
 
+- import_playbook: zig/vscode.yaml
+
 # ##### Applications (free)
 
 - import_playbook: alacritty/customization.yaml

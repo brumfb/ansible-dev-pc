@@ -51,6 +51,9 @@
 # neovim
 - import_playbook: neovim/core.yaml
 
+# zig
+- import_playbook: zig/core.yaml
+
 ##### Cloud tools
 - import_playbook: gcloud/core.yaml
 

@@ -1,0 +1,32 @@
+- name: Zig
+  hosts: 127.0.0.1
+  connection: local
+
+  vars:
+    zig_version: 0.15.1
+
+  tasks:
+    # Linux
+    - name: Create binary folder
+      become: yes
+      file:
+        path: /opt/zig/zig{{ zig_version }}
+        state: directory
+      register: zig_directory
+
+    - name: Install Zig (Linux)
+      become: yes
+      unarchive:
+        src: "https://ziglang.org/download/{{ zig_version }}/zig-x86_64-linux-{{ zig_version }}.tar.xz"
+        dest: "{{ zig_directory['path'] }}"
+        remote_src: yes
+        creates: "{{ zig_directory['path'] }}/zig-x86_64-linux-{{ zig_version }}/zig"
+      register: zig_download_linux
+
+    - name: Create symlink to /usr/local/zig
+      become: yes
+      file:
+        path: /usr/local/bin/zig
+        src: "{{ zig_directory['path'] }}/zig-x86_64-linux-{{ zig_version }}/zig"
+        state: link
+
