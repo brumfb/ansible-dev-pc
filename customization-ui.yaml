@@ -28,6 +28,8 @@
       - key: /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/use-theme-colors
         value: "false"
       # Fonts
+      - key: /org/gnome/desktop/interface/font-name
+        value: "'Noto Sans 10'"
       - key: /org/gnome/desktop/interface/monospace-font-name
         value: "'UbuntuMono Nerd Font Mono 12'"
       # UI tweaks
