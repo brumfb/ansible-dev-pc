@@ -3,11 +3,10 @@
   connection: local
 
   vars:
-    is_ubuntu_bionic: "{{ ansible_distribution_release == 'bionic' }}"
-
     distribution_fallback:
       'Pop!_OS': 'Ubuntu'
     distribution: "{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) }}"
+    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' or ansible_distribution == 'Pop!_OS' }}"
     linux_git_packages:
       - git
       - git-gui
@@ -49,21 +48,15 @@
       loop: "{{ linux_git_packages }}"
 
 
-    - name: "[Ubuntu 18.04] Determine latest version"
+    - name: "[Ubuntu] Determine latest version"
       shell:
-        cmd: "curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep \"browser_download_url.*deb\" | grep amd64 | cut -d : -f 2,3 | tr -d \\\""
+        cmd: "curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep \"browser_download_url.*deb\" | grep amd64.deb\\\" | cut -d : -f 2,3 | tr -d \\\""
         warn: false
       register: ripgrep_version
-      when: is_ubuntu_bionic
+      when: is_ubuntu
 
-    - name: "[Ubuntu 18.04] Install ripgrep"
+    - name: "[Ubuntu] Install ripgrep"
       become: yes
       apt:
         deb: "{{ ripgrep_version.stdout }}"
-      when: is_ubuntu_bionic
-
-    - name: "[Other Linux] Install ripgrep"
-      become: yes
-      apt:
-        package: ripgrep
-      when: not is_ubuntu_bionic
+      when: is_ubuntu
