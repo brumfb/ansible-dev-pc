@@ -3,7 +3,8 @@
   connection: local
 
   vars:
-    neovim_version: "0.8.1"
+    neovim_version: "0.11.5"
+    neovim_appimage: "nvim-linux-x86_64.appimage"
 
 
   tasks:
@@ -17,25 +18,24 @@
       delegate_to: localhost
       become: yes
       get_url:
-        url: "https://github.com/neovim/neovim/releases/download/v{{ neovim_version }}/nvim.appimage"
+        url: "https://github.com/neovim/neovim/releases/download/v{{ neovim_version }}/{{ neovim_appimage }}"
         dest: "/opt/nvim"
         headers:
           Accept: "application/octet-stream"
-        checksum: "sha256:https://github.com/neovim/neovim/releases/download/v{{ neovim_version }}/nvim.appimage.sha256sum"
         mode: 0755
 
     - name: Create symlink to /usr/local/vim
       become: yes
       file:
         path: /usr/local/bin/vim
-        src: /opt/nvim/nvim.appimage
+        src: "/opt/nvim/{{ neovim_appimage }}"
         state: link
 
     - name: Create symlink to /usr/local/nvim
       become: yes
       file:
         path: /usr/local/bin/nvim
-        src: /opt/nvim/nvim.appimage
+        src: "/opt/nvim/{{ neovim_appimage }}"
         state: link
 
 
