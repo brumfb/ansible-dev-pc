@@ -3,10 +3,17 @@
   connection: local
 
   tasks:
-    - name: Set vim as default EDITOR 
+    - name: Set vim as default EDITOR
       blockinfile:
         path: ~/.bashrc
         marker: "### {mark} Ansible managed: vim as editor"
         block: |
           export VISUAL=vim
           export EDITOR=${VISUAL}
+
+    - name: Checkout kickstart.nvim
+      ansible.builtin.git:
+        repo: 'https://github.com/brumfb/kickstart.nvim.git'
+        dest: ~/.config/nvim
+        version: master
+
