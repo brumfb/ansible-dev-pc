@@ -1,0 +1,19 @@
+- name: ghostty (customization)
+  hosts: 127.0.0.1
+  connection: local
+
+  vars:
+
+
+  tasks:
+    - name: ghostty configuration overrides
+      blockinfile:
+        path: ~/.config/ghostty/config
+        marker: "### {mark} Ansible managed: copy/paste override"
+        block: |
+
+          keybind = ctrl+shift+v=unbind
+          keybind = ctrl+shift+c=unbind
+          keybind = alt+shift+v=paste_from_clipboard
+          keybind = alt+shift+c=copy_to_clipboard
+
