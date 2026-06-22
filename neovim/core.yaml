@@ -3,7 +3,7 @@
   connection: local
 
   vars:
-    neovim_version: "0.11.5"
+    neovim_version: "0.12.3"
     neovim_appimage: "nvim-linux-x86_64.appimage"
 
 
