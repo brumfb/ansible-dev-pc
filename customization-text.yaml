@@ -294,12 +294,15 @@
               *)   ;;
             esac
           fi
-    
+
     - name: Add tmux.conf
       blockinfile:
         path: ~/.tmux.conf
         marker: "### {mark} Ansible managed: tmux conf"
         block: |
           set -g mouse on
+          set-option -sg escape-time 10
+          set-option -g focus-events on
+          set-option -g default-terminal "screen-256color"
         create: true
 
