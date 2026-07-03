@@ -51,3 +51,4 @@
       copy:
         src: keybindings.json
         dest: ~/.config/Code/User/keybindings.json
+        unsafe_writes: true
