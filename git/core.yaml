@@ -44,7 +44,6 @@
     - name: "[Ubuntu 18.04] Determine latest version"
       shell:
         cmd: "curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep \"browser_download_url.*deb\" | grep amd64 | cut -d : -f 2,3 | tr -d \\\""
-        warn: false
       register: ripgrep_version
       when: is_ubuntu_bionic
 
