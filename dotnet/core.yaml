@@ -6,8 +6,8 @@
     distribution_fallback:
       'Pop!_OS': 'Ubuntu'
     distribution: "{{ distribution_fallback[ansible_distribution] | default(ansible_distribution) }}"
-    dotnet_runtime_versions: ["9.0"]
-    dotnet_sdk_version: "9.0"
+    dotnet_runtime_versions: ["10.0","8.0"]
+    dotnet_sdk_version: "10.0"
     is_ubu_22_04_or_newer: "{{ distribution == 'Ubuntu' and (ansible_distribution_major_version | int) >= 22 }}"
 
 
