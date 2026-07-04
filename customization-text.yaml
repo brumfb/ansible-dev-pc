@@ -98,6 +98,7 @@
         marker: "### {mark} Ansible managed: isearch termination on tab"
         block: |
           set isearch-terminators "\C-[\C-J\t"
+        create: true
       when: is_wsl
 
   # Common
