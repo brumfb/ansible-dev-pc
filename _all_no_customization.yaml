@@ -30,9 +30,6 @@
 # golang
 - import_playbook: golang/core.yaml
 
-# Mono (.NET Framework)
-- import_playbook: mono/core.yaml
-
 # NodeJS
 - import_playbook: nodejs/core.yaml
 
