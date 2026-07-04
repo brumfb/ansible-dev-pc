@@ -3,7 +3,7 @@
   connection: local
 
   vars:
-    neovim_version: "0.8.1"
+    neovim_version: "0.12.3"
     is_mac: "{{ ansible_distribution == 'MacOSX' }}"
 
   tasks:
@@ -13,29 +13,42 @@
         path: /opt/nvim
         state: directory
 
+    - name: Get neovim release info
+      uri:  
+        url: "https://api.github.com/repos/neovim/neovim/releases/tags/v{{ neovim_version }}"
+        return_content: true
+      register: neovim_release
+
+    - name: Get appimage download info
+      ansible.builtin.set_fact:
+        appimage_dl_info: "{{ neovim_release.json | json_query( release_query ) }}"
+      vars:
+        release_query: "assets[?name=='nvim-linux-x86_64.appimage'] | [0].{digest: digest, url: browser_download_url}"
+
     - name: Download neovim
       delegate_to: localhost
       become: yes
       get_url:
-        url: "https://github.com/neovim/neovim/releases/download/v{{ neovim_version }}/nvim.appimage"
+        url: "{{ appimage_dl_info.url }}"
         dest: "/opt/nvim"
         headers:
           Accept: "application/octet-stream"
-        checksum: "sha256:https://github.com/neovim/neovim/releases/download/v{{ neovim_version }}/nvim.appimage.sha256sum"
+        checksum: "{{ appimage_dl_info.digest }}"
         mode: 0755
+      register: nvim_appimage
 
     - name: Create symlink to /usr/local/vim
       become: yes
       file:
         path: /usr/local/bin/vim
-        src: /opt/nvim/nvim.appimage
+        src: "{{ nvim_appimage.dest }}"
         state: link
 
     - name: Create symlink to /usr/local/nvim
       become: yes
       file:
         path: /usr/local/bin/nvim
-        src: /opt/nvim/nvim.appimage
+        src: "{{ nvim_appimage.dest }}"
         state: link
 
 
