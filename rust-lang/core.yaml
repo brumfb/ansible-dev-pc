@@ -2,9 +2,6 @@
   hosts: 127.0.0.1
   connection: local
 
-  vars:
-
-
   tasks:
     # Linux
     - name: Install pre-requisites
@@ -23,3 +20,7 @@
       shell:
         cmd: curl https://sh.rustup.rs -sSf | sh -s -- -y
         creates: ~/.cargo/bin/cargo
+
+    - name: Ensure Rust stable up to date
+      shell:
+        cmd: "rustup update"

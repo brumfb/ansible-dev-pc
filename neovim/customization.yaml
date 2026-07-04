@@ -1,6 +1,11 @@
+- import_playbook: ../rust-lang/core.yaml
+
 - name: neovim (customization)
   hosts: 127.0.0.1
   connection: local
+
+  vars:
+    treesitter_version: 0.26.10
 
   tasks:
     - name: Set vim as default EDITOR
@@ -10,6 +15,12 @@
         block: |
           export VISUAL=vim
           export EDITOR=${VISUAL}
+
+    # Can't simply use unarchive builtin module for older releases of Linux (<= 22.04) so building via rust for now
+    - name: Install tree-sitter-cli via rust
+      command: "~/.cargo/bin/rustup run stable cargo install --locked tree-sitter-cli@{{ treesitter_version }}"
+      args:
+        creates: ~/.cargo/bin/tree-sitter
 
     - name: Checkout kickstart.nvim
       ansible.builtin.git:
