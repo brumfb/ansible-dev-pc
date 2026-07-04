@@ -20,8 +20,6 @@
         cut -d : -f 2,3 |
         tr -d '"'
       register: docker_compose_version
-      args:
-        warn: false
 
     - name: Install Docker Compose (Linux)
       become: yes
