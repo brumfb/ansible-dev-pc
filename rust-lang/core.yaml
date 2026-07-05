@@ -10,6 +10,7 @@
         package: "{{ item }}"
       loop:
         - build-essential
+        - clang
         - curl
         - gcc
         - make
