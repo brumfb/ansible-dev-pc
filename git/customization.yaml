@@ -6,12 +6,12 @@
 
   tasks:
     - name: Install diffr
-      command: ~/.cargo/bin/cargo install diffr
+      command: ~/.cargo/bin/rustup run stable cargo install diffr
       args:
         creates: ~/.cargo/bin/diffr
 
     - name: Install difftastic
-      command: ~/.cargo/bin/cargo install difftastic
+      command: ~/.cargo/bin/rustup run stable cargo install difftastic
       args:
         creates: ~/.cargo/bin/difft
 
