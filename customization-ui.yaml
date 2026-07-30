@@ -48,7 +48,7 @@
       - key: /org/gnome/settings-daemon/plugins/xsettings/antialiasing
         value: "'grayscale'"
       - key: /org/gnome/shell/favorite-apps
-        value: "['alacritty.desktop', 'microsoft-edge-beta.desktop', 'postman.desktop', 'slack.desktop', 'virt-manager.desktop', 'code.desktop', 'org.remmina.Remmina.desktop']"
+        value: "['microsoft-edge-beta.desktop', 'slack.desktop', 'virt-manager.desktop', 'code.desktop', 'org.remmina.Remmina.desktop']"
       - key: /org/gnome/shell/extensions/desktop-icons/show-home
         value: "false"
       - key: /org/gnome/shell/extensions/desktop-icons/show-trash
@@ -468,18 +468,6 @@
     #   loop:
     #     - paper-icon-theme
     #   when: is_ubuntu and not is_wsl
-
-    - name: "Install PIP 3"
-      become: yes
-      apt:
-        package: python3-pip
-      when:  not is_wsl
-
-    - name: "Install psutil Python package"
-      become: yes
-      pip:
-        name: psutil
-      when:  not is_wsl
 
     - name: "Update customization with dconf"
       dconf:
