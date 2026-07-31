@@ -38,6 +38,7 @@
         - pkief.material-icon-theme                       # Material Icon Theme
         - pflannery.vscode-versionlens                     # Version Lens
         - streetsidesoftware.code-spell-checker           # Code Spell Checker
+        - thenikso.nikso-vscode-theme                     # Full theme
 
     - name: Override default VS Code preferences
       copy:
