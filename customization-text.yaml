@@ -287,9 +287,9 @@
           fi
 
           # Start in the ~/dev folder when it exists (and we're in an interactive shell)
-          # hack: We don't change directory if we are running as a VSCode terminal window as
+          # hack: We don't change directory if we are running as a VSCode or tmux terminal window as
           # detected by the VSCODE_* environment variable
-          if [ -z "${VSCODE_GIT_IPC_HANDLE}" ] && [ -d ~/dev ]; then
+          if [ -z "${TMUX}" ] && [ -z "${VSCODE_GIT_IPC_HANDLE}" ] && [ -d ~/dev ]; then
             case "$-" in
               *i*) cd ~/dev ;;
               *)   ;;
@@ -305,5 +305,9 @@
           set-option -sg escape-time 10
           set-option -g focus-events on
           set-option -g default-terminal "screen-256color"
+
+          bind '"' split-window -c "#{pane_current_path}"
+          bind % split-window -h -c "#{pane_current_path}"
+          bind c new-window -c "#{pane_current_path}"
         create: true
 
