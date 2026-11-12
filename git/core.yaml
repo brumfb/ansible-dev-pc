@@ -49,13 +49,16 @@
 
 
     - name: "[Ubuntu] Determine latest version"
-      shell:
-        cmd: "curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep \"browser_download_url.*deb\" | grep amd64.deb\\\" | cut -d : -f 2,3 | tr -d \\\""
-      register: ripgrep_version
+      shell: |
+        curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest \
+          | grep -oE '"browser_download_url"\s*:\s*"https://[^"]+amd64\.deb"' \
+          | grep -oE 'https://[^"]+' \
+          | head -n 1
+      register: ripgrep_deb_url
       when: is_ubuntu
 
     - name: "[Ubuntu] Install ripgrep"
       become: yes
       apt:
-        deb: "{{ ripgrep_version.stdout }}"
+        deb: "{{ ripgrep_deb_url.stdout | trim }}"
       when: is_ubuntu
