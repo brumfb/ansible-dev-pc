@@ -65,5 +65,7 @@
         path: ~/.local/share/applications/alacritty.desktop
         regexp: __ICON__
         replace: "{{ alacritty_icons.files[0].path }}"
-      when:  not is_wsl
+      when:
+        - not is_wsl
+        - alacritty_icons.matched > 0
 
